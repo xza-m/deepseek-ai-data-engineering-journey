@@ -12,7 +12,7 @@ make validate
 也可以不使用 Make：
 
 ```bash
-uv sync --python 3.11 --extra dev
+uv sync --python 3.11 --extra dev --extra train
 uv run ruff check .
 uv run pytest
 ```

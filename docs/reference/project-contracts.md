@@ -81,6 +81,64 @@
 
 Manifest 不包含生成时间、用户名、主机名和绝对路径。这些字段与数据语义无关，会破坏确定性。
 
+## 训练运行 `run_manifest.json`
+
+Lab 02 使用独立的 Run Manifest 把模型训练绑定到 Dataset Manifest：
+
+```json
+{
+  "schema_version": "0.1",
+  "training_version": "0.1.0",
+  "run_fingerprint": "...",
+  "dataset": {
+    "pipeline_fingerprint": "...",
+    "sequences_sha256": "...",
+    "vocab_size": 320,
+    "sequence_length": 64
+  },
+  "config": {
+    "steps": 100,
+    "batch_size": 4,
+    "seed": 42
+  },
+  "split": {
+    "train_sequence_ids": ["seq_00000000"],
+    "validation_sequence_ids": ["seq_00000001"]
+  },
+  "metrics": {
+    "initial_train_loss": 5.9,
+    "final_train_loss": 0.1,
+    "validation_loss": 6.0,
+    "tokens_per_second": 1000.0
+  },
+  "model_state_sha256": "..."
+}
+```
+
+`run_fingerprint` 由以下语义字段确定：
+
+- `training_version`；
+- Dataset 的 `pipeline_fingerprint`；
+- 完整训练配置；
+- 训练/验证 Sequence 拆分。
+
+运行时间和 Tokens/s 不进入 Run Fingerprint，因为它们随机器负载和硬件变化。模型状态使用独立哈希，
+用于判断相同数据、代码与训练配置是否得到相同参数。
+
+Lab 02 的拆分单位是 Sequence，只用于本地训练闭环。它不承诺文档级隔离，也不能作为正式泛化评测。
+
+## Checkpoint `checkpoint.pt`
+
+Checkpoint 包含：
+
+- 模型状态与优化器状态；
+- 训练 Step 和训练配置；
+- Dataset Fingerprint 与 Run Fingerprint；
+- 训练/验证 Sequence 拆分。
+
+Run Manifest 同时记录 Checkpoint 文件哈希与模型状态哈希。前者检测文件是否被修改，后者检测重新加载后的模型参数。
+Lab 02 尚未保存调度器、随机状态和数据游标，因此只证明模型状态可以重新加载，不宣称支持精确断点续训。
+
 ## 证据等级
 
 | 等级 | 需要的证据 |

@@ -8,7 +8,8 @@
 make validate
 ```
 
-成功条件：命令退出码为 0，且 Lab 01 最终输出 `dataset validation passed`。
+成功条件：命令退出码为 0，Lab 01 输出 `dataset validation passed`，Lab 02 输出
+`training run validation passed`。
 
 ## 单独运行
 
@@ -17,6 +18,7 @@ make lint
 make test
 make lab00
 make lab01
+make lab02
 ```
 
 ## 常见失败
@@ -34,7 +36,7 @@ make setup
 不要替换系统 Python。执行：
 
 ```bash
-uv sync --python 3.11 --extra dev
+uv sync --python 3.11 --extra dev --extra train
 ```
 
 ### Manifest 验证失败
@@ -47,6 +49,27 @@ make lab01
 ```
 
 如果仍然失败，检查是否只修改了代码，却没有同步更新数据契约和测试。
+
+### 训练依赖未安装
+
+Lab 02 使用独立的训练依赖：
+
+```bash
+uv sync --extra train
+```
+
+Lab 00/01 不依赖 PyTorch。只安装核心依赖时，数据 Pipeline 仍应可以运行。
+
+### Training Run 验证失败
+
+先确认上游 Dataset 没有被重新生成或修改：
+
+```bash
+uv run aide validate-dataset --output artifacts/lab01
+uv run aide validate-training-run --dataset artifacts/lab01 --output artifacts/lab02
+```
+
+如果 Dataset Fingerprint 已变化，应重新运行 Lab 02，不能把旧 Checkpoint 强行绑定到新数据版本。
 
 ### 依赖锁变化
 

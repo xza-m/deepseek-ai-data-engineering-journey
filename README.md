@@ -63,7 +63,7 @@ Data + AI 底层深入的人。我们以 DeepSeek 的
 路线采用螺旋式学习：先用小数据接通完整链路，再依次增加数据质量、规模、故障和基础设施复杂度。
 每个阶段都回到同一个问题——这次数据或系统变化，是否真实影响了模型指标、训练效率或工程成本？
 
-## 5 分钟开始第一个实验
+## 开始第一条端到端链路
 
 本地要求：macOS 或 Linux、Git，以及可以安装 Python 3.11 的 `uv`。
 
@@ -74,6 +74,7 @@ cd deepseek-ai-data-engineering-journey
 make setup
 make lab00
 make lab01
+make lab02
 make validate
 ```
 
@@ -97,11 +98,28 @@ JSONL 文档
 - `sequences.jsonl`：固定长度的 `input_ids`、`labels`、`loss_mask` 和来源血缘；
 - `manifest.json`：输入、配置、哈希、Token 数和 Packing 指标。
 
+`make lab02` 会继续把这些 Sequence 送入一个本地 Tiny Transformer：
+
+```text
+Dataset Manifest
+→ PyTorch Dataset / DataLoader
+→ Causal Transformer
+→ Masked Cross Entropy Loss
+→ Checkpoint
+→ Run Manifest
+```
+
+输出位于本地 `artifacts/lab02/`：
+
+- `checkpoint.pt`：模型和优化器状态；
+- `run_manifest.json`：Dataset Fingerprint、训练配置、拆分、Loss、吞吐和模型状态哈希。
+
 开始前建议依次阅读：
 
 1. [Lab 00：环境与证据边界](docs/tutorials/00-environment.md)
 2. [Lab 01：从文档到训练 Token](docs/tutorials/01-document-to-token.md)
-3. [数据产物契约](docs/reference/project-contracts.md)
+3. [Lab 02：Tiny LLM 基线训练](docs/tutorials/02-tiny-llm-baseline.md)
+4. [数据产物契约](docs/reference/project-contracts.md)
 
 ## 项目演进结构
 
@@ -109,7 +127,7 @@ JSONL 文档
 | --- | --- | --- | --- |
 | 0 | 环境、证据等级、项目方法 | 环境报告 | 可运行 |
 | 1 | 文档到 Token | Manifest、Tokenizer、Sequence | 可运行 |
-| 2 | Tiny LLM 基线 | Loss、Tokens/s、Checkpoint | 规划中 |
+| 2 | Tiny LLM 基线 | Loss、Tokens/s、Checkpoint | 可运行 |
 | 3 | 最小数据版本 A/B | 受控变量实验报告 | 规划中 |
 | 4 | 质量、污染与近似去重 | 质量报告、去重索引 | 规划中 |
 | 5 | 数据混合、Packing 与 Sharding | 可复现训练数据版本 | 规划中 |
