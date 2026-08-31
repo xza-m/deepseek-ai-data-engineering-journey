@@ -2,36 +2,66 @@
 
 [![CI](https://github.com/xza-m/deepseek-ai-data-engineering-journey/actions/workflows/ci.yml/badge.svg)](https://github.com/xza-m/deepseek-ai-data-engineering-journey/actions/workflows/ci.yml)
 
-一个面向传统数据工程师的开源学习项目。我们以 DeepSeek 的
+一个面向**在职传统数据工程师**的开源职业转型项目。它服务于仍以 SQL、ETL、数仓建模、
+数据开发和任务调度为主要工作的工程师，也服务于已经接触 Agent 或 LLM 应用、但希望继续向
+Data + AI 底层深入的人。我们以 DeepSeek 的
 [smallpond](https://github.com/deepseek-ai/smallpond)、
 [3FS](https://github.com/deepseek-ai/3FS) 和
 [DeepSeek-V3 Technical Report](https://arxiv.org/abs/2412.19437)
-为主要技术依托，通过真实、可复现的本地实验，建立从数据加工到 LLM 训练数据系统的完整知识体系。
+为主要技术锚点，通过真实、可复现的本地项目，建立从传统数据工程到 LLM 训练数据系统的完整知识体系。
 
-> 项目的目标不是追逐新名词，而是让数据工程师能够对训练数据质量、数据血缘、模型效果和系统吞吐共同负责。
+> 项目的目标不是教你调用更多 AI API，而是让你能够对训练数据质量、样本血缘、模型效果和系统吞吐共同负责。
+
+## 为什么做这个项目
+
+传统数据工作正在被 AI 重塑。只会写 SQL、维护 ETL 或交付报表的岗位空间会被压缩，但数据工程师已有的
+建模、批处理、质量、血缘、调度和生产化能力并没有过时。真正需要完成的是一次责任升级：
+
+```text
+交付一张正确的表
+    → 交付一个可训练、可追溯的数据版本
+    → 证明这个数据版本如何影响模型质量、训练效率和工程成本
+```
+
+这个仓库不是为零基础学生设计的课堂，也不是 RAG、Prompt 或 Agent 应用开发合集。它是一条可以与日常工作
+并行推进的工程实践路线：用 16 周完成一个持续演进的 Mini-LLM Data Factory，并把每个阶段沉淀成可以复现、
+讲解和开源的职业作品。
 
 ## 适合谁
 
-- 熟悉 SQL、ETL、数仓分层、任务调度或数据治理的数据工程师；
-- 希望理解 Token、训练样本、DataLoader、Checkpoint 和分布式训练的人；
-- 准备进入 AI Data、训练平台、AI Infra 或大模型数据治理方向的人。
+- 以 SQL、ETL、DataWorks、Spark、Flink 或数仓建模为主要技能的数据开发；
+- 日常已经使用 AI、甚至开发过 Agent，但对训练数据与训练系统仍缺少系统认识的工程师；
+- 希望进入 AI Data、训练数据平台、数据治理或 AI Infra 方向的在职工程师；
+- 希望用一个真实开源项目证明能力，而不是只积累课程证书的人。
 
-你不需要先掌握 CUDA、RDMA 或大模型训练框架。项目会从一条文档如何变成训练 Token 开始。
+默认你已经会 SQL，理解基本的数据加工和工程交付。你不需要先掌握 CUDA、RDMA 或大模型训练框架；
+项目会从一条文档如何变成训练 Token 开始，再逐步进入模型反馈、规模化计算和 AI 存储。
+
+项目当前不以以下目标为主线：
+
+- 零基础编程或 SQL 入门；
+- Agent 编排、Prompt 技巧或应用层框架大全；
+- 从零训练具有实际通用能力的大模型；
+- 把所有参与者培养成 CUDA、分布式训练或存储内核开发者。
 
 ## 学习主线
 
 ```text
 传统数据工程
     → 文档、样本、Token、Sequence 与 Loss
-    → 清洗、去重、质量评估和数据混合
-    → Tokenization、Packing、Sharding 与 Manifest
+    → 最小 Tiny LLM 与第一次数据版本 A/B
+    → 清洗、去重、质量评估、数据混合与治理
+    → Tokenization、Packing、Sharding 与 Dataset Manifest
     → smallpond / DuckDB / Ray 分布式数据加工
     → DataLoader、Checkpoint 与分布式训练
     → 3FS、NVMe、RDMA 与 AI 存储
-    → 数据版本—训练—评测—数据改进闭环
+    → 正式的数据版本—训练—评测—归因—数据改进闭环
 ```
 
 完整能力地图见 [知识地图](docs/knowledge-map.md)，学习节奏见 [16 周路线](ROADMAP.md)。
+
+路线采用螺旋式学习：先用小数据接通完整链路，再依次增加数据质量、规模、故障和基础设施复杂度。
+每个阶段都回到同一个问题——这次数据或系统变化，是否真实影响了模型指标、训练效率或工程成本？
 
 ## 5 分钟开始第一个实验
 
@@ -73,19 +103,21 @@ JSONL 文档
 2. [Lab 01：从文档到训练 Token](docs/tutorials/01-document-to-token.md)
 3. [数据产物契约](docs/reference/project-contracts.md)
 
-## 课程结构
+## 项目演进结构
 
 | 阶段 | 主题 | 核心产物 | 状态 |
 | --- | --- | --- | --- |
 | 0 | 环境、证据等级、项目方法 | 环境报告 | 可运行 |
 | 1 | 文档到 Token | Manifest、Tokenizer、Sequence | 可运行 |
-| 2 | 清洗、质量与近似去重 | 质量报告、去重索引 | 规划中 |
-| 3 | 数据混合、Packing 与 Sharding | 可复现训练数据版本 | 规划中 |
-| 4 | smallpond、Partition 与 Shuffle | 分布式加工 Pipeline | 规划中 |
-| 5 | DataLoader 与 Tiny LLM | Loss、Tokens/s、等待时间 | 规划中 |
-| 6 | Checkpoint 与恢复 | 可恢复训练实验 | 规划中 |
-| 7 | 3FS 架构与 I/O | 设计推演、可选 Linux 集群实验 | 规划中 |
-| 8 | 数据—模型反馈闭环 | 数据版本 A/B 评测 | 规划中 |
+| 2 | Tiny LLM 基线 | Loss、Tokens/s、Checkpoint | 规划中 |
+| 3 | 最小数据版本 A/B | 受控变量实验报告 | 规划中 |
+| 4 | 质量、污染与近似去重 | 质量报告、去重索引 | 规划中 |
+| 5 | 数据混合、Packing 与 Sharding | 可复现训练数据版本 | 规划中 |
+| 6 | smallpond、Partition 与 Shuffle | 分布式加工 Pipeline | 规划中 |
+| 7 | DataLoader 与 I/O | 等待时间和吞吐诊断 | 规划中 |
+| 8 | Checkpoint 与恢复 | 可恢复训练实验 | 规划中 |
+| 9 | 3FS 架构与 I/O | 设计推演、可选 Linux 集群实验 | 规划中 |
+| 10 | 正式反馈闭环与毕业项目 | 数据—模型归因报告、复现脚本 | 规划中 |
 
 “规划中”代表学习目标和验收已定义，不代表代码已经实现。我们不会用占位页面冒充完成。
 
@@ -105,6 +137,7 @@ JSONL 文档
 - 在 macOS 上伪装完成生产级 3FS 部署；
 - 训练一个以参数规模为目标的“大模型”；
 - 提前建设 Web 平台、规则引擎或通用任务系统；
+- 把 Agent 应用开发包装成 AI 数据工程主线；
 - 把本地小数据实验结论包装成 PB 级生产结论。
 
 项目将严格区分四类证据：原理理解、本地实验、集群基准和生产验证。详见

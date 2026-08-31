@@ -1,21 +1,34 @@
 # 实验索引
 
+这些 Lab 不是彼此独立的课堂作业，而是同一个 Mini-LLM Data Factory 的连续版本。后一个 Lab 必须消费或引用
+前一个 Lab 的数据产物、Manifest 或实验基线。
+
 实验状态只使用三种值：
 
 - `可运行`：代码、文档、测试和验收全部存在；
-- `设计完成`：学习目标和验收已定义，代码尚未交付；
+- `规格已定义`：学习目标和验收已定义，代码尚未交付；
 - `待设计`：只存在路线方向。
 
 | Lab | 主题 | 状态 | 入口 |
 | --- | --- | --- | --- |
 | 00 | 环境与证据边界 | 可运行 | [教程](../docs/tutorials/00-environment.md) |
 | 01 | 文档到训练 Token | 可运行 | [教程](../docs/tutorials/01-document-to-token.md) |
-| 02 | 解析、质量与近似去重 | 设计完成 | [路线第 3～5 周](../ROADMAP.md) |
-| 03 | 数据混合、Packing 与 Sharding | 设计完成 | [路线第 6 周](../ROADMAP.md) |
-| 04 | smallpond Partition 与 Shuffle | 设计完成 | [路线第 7～9 周](../ROADMAP.md) |
-| 05 | DataLoader 与 Tiny LLM | 设计完成 | [路线第 10～11 周](../ROADMAP.md) |
-| 06 | Checkpoint 与恢复 | 设计完成 | [路线第 12 周](../ROADMAP.md) |
-| 07 | 3FS 架构与 I/O | 设计完成 | [路线第 13～14 周](../ROADMAP.md) |
-| 08 | 数据版本 A/B | 设计完成 | [路线第 15～16 周](../ROADMAP.md) |
+| 02 | Tiny LLM 基线训练 | 规格已定义 | [路线第 3 周](../ROADMAP.md) |
+| 03 | 最小数据版本 A/B | 规格已定义 | [路线第 4 周](../ROADMAP.md) |
+| 04 | 质量、污染与近似去重 | 规格已定义 | [路线第 5～6 周](../ROADMAP.md) |
+| 05 | 数据混合、Packing 与 Sharding | 规格已定义 | [路线第 6 周](../ROADMAP.md) |
+| 06 | smallpond Partition、Shuffle 与故障 | 规格已定义 | [路线第 7～9 周](../ROADMAP.md) |
+| 07 | DataLoader 与 I/O | 规格已定义 | [路线第 10、13 周](../ROADMAP.md) |
+| 08 | Checkpoint 与训练恢复 | 规格已定义 | [路线第 11～12 周](../ROADMAP.md) |
+| 09 | 3FS 架构与 I/O | 规格已定义 | [路线第 13～14 周](../ROADMAP.md) |
+| 10 | 正式数据 A/B 与毕业项目 | 规格已定义 | [路线第 15～16 周](../ROADMAP.md) |
 
 后续只在代码和测试可以一起提交时创建新 Lab 目录。
+
+## 当前开发优先级
+
+1. Lab 02：先把 Dataset 接到 Tiny LLM，形成数据到 Loss 的反馈；
+2. Lab 03：建立固定变量的数据 A/B 框架；
+3. Lab 04：再加入近似去重、污染检测和质量策略，并回到 A/B 验证。
+
+这个顺序优先建立反馈闭环。不能因为后续模块更“底层”或更新颖，就跳过训练基线和受控实验。
