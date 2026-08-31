@@ -75,6 +75,7 @@ python3 -m json.tool artifacts/lab02/run_manifest.json
 - `metrics.initial_train_loss` 和 `final_train_loss`：模型是否能够拟合训练数据；
 - `metrics.validation_loss`：重新加载 Checkpoint 时需要复算的基线；
 - `metrics.tokens_per_second`：当前机器的本地运行指标；
+- `initial_model_state_sha256`：根据 Seed 重建的初始参数哈希；
 - `model_state_sha256`：与 Checkpoint 容器格式无关的模型状态哈希。
 
 `duration_seconds` 和 `tokens_per_second` 不进入 Run Fingerprint。相同语义运行在不同机器上可以具有相同 Fingerprint，
@@ -118,8 +119,9 @@ uv run aide validate-training-run \
 2. Run Fingerprint；
 3. Checkpoint 文件哈希；
 4. Checkpoint 内的数据版本、训练配置和 Step；
-5. 重新加载后的模型状态哈希；
-6. 重新计算的 Validation Loss。
+5. 根据 Seed 重建的初始模型状态哈希；
+6. 重新加载后的最终模型状态哈希；
+7. 重新计算的 Validation Loss。
 
 Lab 02 只证明 Checkpoint 可以加载并恢复模型状态。优化器、随机状态和数据游标的精确断点续训属于后续 Checkpoint Lab。
 
@@ -134,6 +136,7 @@ uv run aide train-tiny-lm \
 比较两个 Run Manifest 中的：
 
 - `run_fingerprint`；
+- `initial_model_state_sha256`；
 - `model_state_sha256`；
 - `metrics.loss_history`。
 

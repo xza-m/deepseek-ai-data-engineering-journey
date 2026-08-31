@@ -28,12 +28,14 @@ def _create_parser() -> argparse.ArgumentParser:
     build_parser.add_argument("--output", type=Path, required=True, help="产物目录")
     build_parser.add_argument("--vocab-size", type=int, default=320)
     build_parser.add_argument("--sequence-length", type=int, default=64)
+    build_parser.add_argument("--tokenizer", type=Path, help="复用已有 Tokenizer，不重新训练词表")
 
     validate_parser = commands.add_parser("validate-dataset", help="验证 Lab 01 数据产物")
     validate_parser.add_argument("--output", type=Path, required=True, help="产物目录")
 
     train_parser = commands.add_parser("train-tiny-lm", help="执行 Lab 02 Tiny LM 基线训练")
     train_parser.add_argument("--dataset", type=Path, required=True, help="Lab 01 Dataset 目录")
+    train_parser.add_argument("--evaluation-dataset", type=Path, help="独立 Evaluation Dataset 目录")
     train_parser.add_argument("--output", type=Path, required=True, help="训练产物目录")
     train_parser.add_argument("--steps", type=int, default=argparse.SUPPRESS)
     train_parser.add_argument("--batch-size", type=int, default=argparse.SUPPRESS)
@@ -44,10 +46,32 @@ def _create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument("--feed-forward-dim", type=int, default=argparse.SUPPRESS)
     train_parser.add_argument("--validation-fraction", type=float, default=argparse.SUPPRESS)
     train_parser.add_argument("--seed", type=int, default=argparse.SUPPRESS)
+    train_parser.add_argument("--strict-token-budget", action="store_true", default=argparse.SUPPRESS)
 
     validate_training_parser = commands.add_parser("validate-training-run", help="验证 Lab 02 训练产物")
     validate_training_parser.add_argument("--dataset", type=Path, required=True, help="Lab 01 Dataset 目录")
+    validate_training_parser.add_argument("--evaluation-dataset", type=Path, help="独立 Evaluation Dataset 目录")
     validate_training_parser.add_argument("--output", type=Path, required=True, help="训练产物目录")
+
+    experiment_parser = commands.add_parser("run-data-ab", help="执行 Lab 03 受控数据版本 A/B")
+    experiment_parser.add_argument("--tokenizer-corpus", type=Path, required=True)
+    experiment_parser.add_argument("--baseline", type=Path, required=True)
+    experiment_parser.add_argument("--candidate", type=Path, required=True)
+    experiment_parser.add_argument("--evaluation", type=Path, required=True)
+    experiment_parser.add_argument("--output", type=Path, required=True)
+    experiment_parser.add_argument("--vocab-size", type=int, default=384)
+    experiment_parser.add_argument("--sequence-length", type=int, default=64)
+    experiment_parser.add_argument("--steps", type=int, default=argparse.SUPPRESS)
+    experiment_parser.add_argument("--batch-size", type=int, default=argparse.SUPPRESS)
+    experiment_parser.add_argument("--learning-rate", type=float, default=argparse.SUPPRESS)
+    experiment_parser.add_argument("--embedding-dim", type=int, default=argparse.SUPPRESS)
+    experiment_parser.add_argument("--num-layers", type=int, default=argparse.SUPPRESS)
+    experiment_parser.add_argument("--num-heads", type=int, default=argparse.SUPPRESS)
+    experiment_parser.add_argument("--feed-forward-dim", type=int, default=argparse.SUPPRESS)
+    experiment_parser.add_argument("--seed", type=int, default=argparse.SUPPRESS)
+
+    validate_experiment_parser = commands.add_parser("validate-data-ab", help="验证 Lab 03 A/B 实验")
+    validate_experiment_parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -61,7 +85,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     if args.command == "build-dataset":
-        manifest = build_dataset(args.input, args.output, args.vocab_size, args.sequence_length)
+        manifest = build_dataset(args.input, args.output, args.vocab_size, args.sequence_length, args.tokenizer)
         print(json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 
@@ -91,10 +115,16 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "feed_forward_dim",
                 "validation_fraction",
                 "seed",
+                "strict_token_budget",
             )
             if hasattr(args, name)
         }
-        run_manifest = train_tiny_lm(args.dataset, args.output, TrainingConfig(**config_fields))
+        run_manifest = train_tiny_lm(
+            args.dataset,
+            args.output,
+            TrainingConfig(**config_fields),
+            evaluation_dataset_dir=args.evaluation_dataset,
+        )
         print(json.dumps(run_manifest, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 
@@ -106,8 +136,58 @@ def main(argv: Sequence[str] | None = None) -> int:
                 raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
             raise
 
-        result = validate_training_run(args.dataset, args.output)
+        result = validate_training_run(args.dataset, args.output, args.evaluation_dataset)
         print("training run validation passed")
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "run-data-ab":
+        try:
+            from ai_data_engineering.experiment import run_data_ab
+            from ai_data_engineering.training import TrainingConfig
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
+            raise
+
+        training_fields = {
+            name: getattr(args, name)
+            for name in (
+                "steps",
+                "batch_size",
+                "learning_rate",
+                "embedding_dim",
+                "num_layers",
+                "num_heads",
+                "feed_forward_dim",
+                "seed",
+            )
+            if hasattr(args, name)
+        }
+        training_config = TrainingConfig(**training_fields, strict_token_budget=True)
+        result = run_data_ab(
+            args.tokenizer_corpus,
+            args.baseline,
+            args.candidate,
+            args.evaluation,
+            args.output,
+            args.vocab_size,
+            args.sequence_length,
+            training_config,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "validate-data-ab":
+        try:
+            from ai_data_engineering.experiment import validate_data_ab
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
+            raise
+
+        result = validate_data_ab(args.output)
+        print("data A/B validation passed")
         print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 

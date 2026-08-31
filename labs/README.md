@@ -14,7 +14,7 @@
 | 00 | 环境与证据边界 | 可运行 | [教程](../docs/tutorials/00-environment.md) |
 | 01 | 文档到训练 Token | 可运行 | [教程](../docs/tutorials/01-document-to-token.md) |
 | 02 | Tiny LLM 基线训练 | 可运行 | [教程](../docs/tutorials/02-tiny-llm-baseline.md) |
-| 03 | 最小数据版本 A/B | 规格已定义 | [路线第 4 周](../ROADMAP.md) |
+| 03 | 最小数据版本 A/B | 可运行 | [教程](../docs/tutorials/03-controlled-data-ab.md) |
 | 04 | 质量、污染与近似去重 | 规格已定义 | [路线第 5～6 周](../ROADMAP.md) |
 | 05 | 数据混合、Packing 与 Sharding | 规格已定义 | [路线第 6 周](../ROADMAP.md) |
 | 06 | smallpond Partition、Shuffle 与故障 | 规格已定义 | [路线第 7～9 周](../ROADMAP.md) |
@@ -27,8 +27,8 @@
 
 ## 当前开发优先级
 
-1. Lab 03：建立固定变量的数据 A/B 框架；
-2. Lab 04：加入近似去重、污染检测和质量策略，并回到 A/B 验证；
-3. Lab 05：建立可复现的数据混合和训练 Shard。
+1. Lab 04：加入近似去重、污染检测和质量策略，并回到 A/B 验证；
+2. Lab 05：建立可复现的数据混合和训练 Shard；
+3. Lab 06：用 DuckDB 和 smallpond 扩展数据加工规模。
 
 这个顺序优先建立反馈闭环。不能因为后续模块更“底层”或更新颖，就跳过训练基线和受控实验。

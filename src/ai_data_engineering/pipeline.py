@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import unicodedata
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, replace
@@ -179,7 +180,13 @@ def _document_provenance(
     return provenance
 
 
-def build_dataset(input_path: Path, output_dir: Path, vocab_size: int, sequence_length: int) -> dict[str, Any]:
+def build_dataset(
+    input_path: Path,
+    output_dir: Path,
+    vocab_size: int,
+    sequence_length: int,
+    tokenizer_path: Path | None = None,
+) -> dict[str, Any]:
     """构建规范化文档、Tokenizer、训练 Sequence 和确定性 Manifest。"""
 
     if sequence_length < 2:
@@ -190,9 +197,21 @@ def build_dataset(input_path: Path, output_dir: Path, vocab_size: int, sequence_
     output_dir.mkdir(parents=True, exist_ok=True)
 
     documents, raw_count, duplicate_count = load_normalized_documents(input_path)
-    tokenizer = train_byte_bpe(documents, vocab_size)
-    tokenizer_path = output_dir / "tokenizer.json"
-    tokenizer.save(str(tokenizer_path), pretty=True)
+    output_tokenizer_path = output_dir / "tokenizer.json"
+    if tokenizer_path is None:
+        tokenizer = train_byte_bpe(documents, vocab_size)
+        tokenizer.save(str(output_tokenizer_path), pretty=True)
+        tokenizer_mode = "trained"
+        vocab_size_requested: int | None = vocab_size
+    else:
+        tokenizer_source_path = tokenizer_path.resolve()
+        if not tokenizer_source_path.is_file():
+            raise FileNotFoundError(f"找不到复用 Tokenizer: {tokenizer_source_path}")
+        tokenizer = Tokenizer.from_file(str(tokenizer_source_path))
+        if tokenizer_source_path != output_tokenizer_path.resolve():
+            shutil.copyfile(tokenizer_source_path, output_tokenizer_path)
+        tokenizer_mode = "reused"
+        vocab_size_requested = None
 
     token_ids = {token: tokenizer.token_to_id(token) for token in SPECIAL_TOKENS}
     if any(token_id is None for token_id in token_ids.values()):
@@ -244,7 +263,7 @@ def build_dataset(input_path: Path, output_dir: Path, vocab_size: int, sequence_
     _write_jsonl(sequences_path, sequences)
 
     source_sha256 = sha256_file(input_path)
-    tokenizer_sha256 = sha256_file(tokenizer_path)
+    tokenizer_sha256 = sha256_file(output_tokenizer_path)
     artifact_sha256 = {
         "normalized_documents": sha256_file(normalized_path),
         "sequences": sha256_file(sequences_path),
@@ -252,7 +271,8 @@ def build_dataset(input_path: Path, output_dir: Path, vocab_size: int, sequence_
     }
     config = {
         "normalization": "NFKC+line-whitespace-v1",
-        "vocab_size_requested": vocab_size,
+        "tokenizer_mode": tokenizer_mode,
+        "vocab_size_requested": vocab_size_requested,
         "vocab_size_actual": tokenizer.get_vocab_size(),
         "sequence_length": sequence_length,
         "special_token_ids": {key: int(value) for key, value in token_ids.items()},
@@ -277,7 +297,7 @@ def build_dataset(input_path: Path, output_dir: Path, vocab_size: int, sequence_
         "artifacts": {
             "normalized_documents": normalized_path.name,
             "sequences": sequences_path.name,
-            "tokenizer": tokenizer_path.name,
+            "tokenizer": output_tokenizer_path.name,
         },
         "artifact_sha256": artifact_sha256,
     }

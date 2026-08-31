@@ -1,6 +1,6 @@
 PYTHON := uv run python
 
-.PHONY: setup lint test lab00 lab01 lab02 validate clean
+.PHONY: setup lint test lab00 lab01 lab02 lab03 validate clean
 
 setup:
 	uv sync --python 3.11 --extra dev --extra train
@@ -30,7 +30,16 @@ lab02: lab01
 		--dataset artifacts/lab01 \
 		--output artifacts/lab02
 
-validate: lint test lab00 lab01 lab02
+lab03: lab02
+	uv run aide run-data-ab \
+		--tokenizer-corpus data/lab03/tokenizer_corpus.jsonl \
+		--baseline data/lab03/train_baseline.jsonl \
+		--candidate data/lab03/train_candidate.jsonl \
+		--evaluation data/lab03/evaluation.jsonl \
+		--output artifacts/lab03
+	uv run aide validate-data-ab --output artifacts/lab03
+
+validate: lint test lab00 lab01 lab02 lab03
 
 clean:
 	rm -rf artifacts .pytest_cache .ruff_cache

@@ -34,3 +34,5 @@ jobs:
           uv run aide validate-dataset --output artifacts/lab01
           uv run aide train-tiny-lm --dataset artifacts/lab01 --output artifacts/lab02
           uv run aide validate-training-run --dataset artifacts/lab01 --output artifacts/lab02
+          uv run aide run-data-ab --tokenizer-corpus data/lab03/tokenizer_corpus.jsonl --baseline data/lab03/train_baseline.jsonl --candidate data/lab03/train_candidate.jsonl --evaluation data/lab03/evaluation.jsonl --output artifacts/lab03
+          uv run aide validate-data-ab --output artifacts/lab03

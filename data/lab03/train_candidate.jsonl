@@ -1,0 +1,20 @@
+{"source_id":"train-001","text":"数据工程师应当为每次训练提供可复现的 Dataset Manifest。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-002","text":"原始文档经过规范化后仍需保留稳定的来源标识和内容哈希。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-003","text":"训练序列包含 input ids、右移 labels、loss mask 和来源血缘。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-004","text":"固定 Tokenizer 可以避免数据 A/B 同时改变词表这一混杂因素。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-005","text":"独立评测集不参与训练，用于观察数据版本对模型结果的影响。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-006","text":"严格 Token 预算让两个实验消费相同数量的有效训练目标。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-007","text":"相同随机种子还需要验证初始模型参数哈希确实一致。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-008","text":"训练 Loss、评测 Loss 和吞吐指标回答的是不同工程问题。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-009","text":"高质量结论必须报告反例、实验边界和无法验证的部分。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-010","text":"数据血缘应当从来源文档连接到 Token、Run 和模型指标。","metadata":{"version":"candidate","quality":"clean","license":"project-original"}}
+{"source_id":"train-011","text":"热门资料模板十一：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-012","text":"热门资料模板十二：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-013","text":"热门资料模板十三：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-014","text":"热门资料模板十四：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-015","text":"热门资料模板十五：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-016","text":"热门资料模板十六：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-017","text":"热门资料模板十七：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-018","text":"热门资料模板十八：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-019","text":"热门资料模板十九：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}
+{"source_id":"train-020","text":"热门资料模板二十：立即点击收藏转发，重复内容带来更多流量，点击点击点击。","metadata":{"version":"candidate","quality":"low-information-near-duplicate","license":"project-original"}}

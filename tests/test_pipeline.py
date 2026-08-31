@@ -54,6 +54,28 @@ def test_build_dataset_rejects_too_small_vocab(tmp_path: Path) -> None:
         build_dataset(source, tmp_path / "output", MIN_BYTE_BPE_VOCAB_SIZE - 1, 16)
 
 
+def test_dataset_can_reuse_a_fixed_tokenizer(tmp_path: Path) -> None:
+    source = tmp_path / "source.jsonl"
+    _write_source(source)
+    tokenizer_dataset = tmp_path / "tokenizer-dataset"
+    reused_dataset = tmp_path / "reused-dataset"
+
+    trained = build_dataset(source, tokenizer_dataset, vocab_size=280, sequence_length=16)
+    reused = build_dataset(
+        source,
+        reused_dataset,
+        vocab_size=999,
+        sequence_length=16,
+        tokenizer_path=tokenizer_dataset / "tokenizer.json",
+    )
+
+    assert trained["config"]["tokenizer_mode"] == "trained"
+    assert reused["config"]["tokenizer_mode"] == "reused"
+    assert trained["tokenizer_sha256"] == reused["tokenizer_sha256"]
+    assert reused["config"]["vocab_size_actual"] == trained["config"]["vocab_size_actual"]
+    validate_dataset(reused_dataset)
+
+
 def test_validator_detects_broken_label_shift(tmp_path: Path) -> None:
     source = tmp_path / "source.jsonl"
     _write_source(source)

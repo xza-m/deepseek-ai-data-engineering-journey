@@ -1,0 +1,20 @@
+{"source_id":"train-001","text":"数据工程师应当为每次训练提供可复现的 Dataset Manifest。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-002","text":"原始文档经过规范化后仍需保留稳定的来源标识和内容哈希。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-003","text":"训练序列包含 input ids、右移 labels、loss mask 和来源血缘。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-004","text":"固定 Tokenizer 可以避免数据 A/B 同时改变词表这一混杂因素。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-005","text":"独立评测集不参与训练，用于观察数据版本对模型结果的影响。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-006","text":"严格 Token 预算让两个实验消费相同数量的有效训练目标。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-007","text":"相同随机种子还需要验证初始模型参数哈希确实一致。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-008","text":"训练 Loss、评测 Loss 和吞吐指标回答的是不同工程问题。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-009","text":"高质量结论必须报告反例、实验边界和无法验证的部分。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-010","text":"数据血缘应当从来源文档连接到 Token、Run 和模型指标。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-011","text":"精确去重使用内容哈希，近似去重还需要相似度和阈值策略。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-012","text":"评测污染会让模型分数虚高，因此训练和评测语料必须隔离。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-013","text":"数据混合权重决定不同语言、领域和难度进入训练的 Token 比例。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-014","text":"Shard 设计需要平衡文件大小、随机读取和训练 Rank 分配。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-015","text":"DuckDB 适合执行本地向量化加工，Parquet 提供列式数据组织。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-016","text":"smallpond 使用显式分区和共享存储组织分布式数据任务。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-017","text":"DataLoader 瓶颈可能来自存储、解压、Tokenization 或 Batch 组装。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-018","text":"Checkpoint 写入速度和恢复正确性共同决定训练故障成本。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-019","text":"3FS 展示了共享文件语义与聚合存储带宽面向 AI 负载的设计。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}
+{"source_id":"train-020","text":"模型失败样例应当追溯到来源数据并形成下一版改进假设。","metadata":{"version":"baseline","quality":"clean","license":"project-original"}}

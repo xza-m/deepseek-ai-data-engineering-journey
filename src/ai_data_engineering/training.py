@@ -33,6 +33,7 @@ class TrainingConfig:
     feed_forward_dim: int = 128
     validation_fraction: float = 0.2
     seed: int = 42
+    strict_token_budget: bool = False
 
     def validate(self) -> None:
         """在唯一可信边界检查训练配置。"""
@@ -156,6 +157,31 @@ def _load_dataset(dataset_dir: Path) -> tuple[dict[str, Any], list[dict[str, Any
     return manifest, records
 
 
+def _dataset_section(manifest: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "pipeline_fingerprint": manifest["pipeline_fingerprint"],
+        "sequences_sha256": manifest["artifact_sha256"]["sequences"],
+        "tokenizer_sha256": manifest["tokenizer_sha256"],
+        "vocab_size": manifest["config"]["vocab_size_actual"],
+        "sequence_length": manifest["config"]["sequence_length"],
+        "sequence_count": manifest["metrics"]["sequence_count"],
+        "artifact": manifest["artifacts"]["sequences"],
+    }
+
+
+def _validate_dataset_compatibility(
+    training_manifest: dict[str, Any], evaluation_manifest: dict[str, Any]
+) -> None:
+    """确保外部评测集与训练集共享 Token 语义和 Sequence 契约。"""
+
+    if training_manifest["tokenizer_sha256"] != evaluation_manifest["tokenizer_sha256"]:
+        raise ValueError("训练集与评测集必须复用同一个 Tokenizer")
+    comparable_config_keys = ("vocab_size_actual", "sequence_length", "special_token_ids")
+    for key in comparable_config_keys:
+        if training_manifest["config"][key] != evaluation_manifest["config"][key]:
+            raise ValueError(f"训练集与评测集的 {key} 不兼容")
+
+
 def _split_records(
     records: list[dict[str, Any]], validation_fraction: float, seed: int
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -205,7 +231,12 @@ def _build_model(dataset_manifest: dict[str, Any], config: TrainingConfig) -> Ti
     )
 
 
-def train_tiny_lm(dataset_dir: Path, output_dir: Path, config: TrainingConfig) -> dict[str, Any]:
+def train_tiny_lm(
+    dataset_dir: Path,
+    output_dir: Path,
+    config: TrainingConfig,
+    evaluation_dataset_dir: Path | None = None,
+) -> dict[str, Any]:
     """训练 Tiny LM 并写出 Checkpoint 与可追溯 Run Manifest。"""
 
     config.validate()
@@ -213,7 +244,31 @@ def train_tiny_lm(dataset_dir: Path, output_dir: Path, config: TrainingConfig) -
     if not dataset_dir.is_dir():
         raise FileNotFoundError(f"找不到 Dataset 目录: {dataset_dir}")
     dataset_manifest, records = _load_dataset(dataset_dir)
-    train_records, validation_records = _split_records(records, config.validation_fraction, config.seed)
+    if evaluation_dataset_dir is None:
+        if config.strict_token_budget:
+            raise ValueError("strict_token_budget 需要独立 evaluation_dataset")
+        train_records, validation_records = _split_records(records, config.validation_fraction, config.seed)
+        excluded_train_records: list[dict[str, Any]] = []
+        evaluation_manifest = None
+        split_mode = "internal_sequence_split"
+        split_note = "按 Sequence 做确定性拆分，只用于本地训练闭环，不代表无文档泄漏的正式评测"
+    else:
+        evaluation_dataset_dir = evaluation_dataset_dir.resolve()
+        if not evaluation_dataset_dir.is_dir():
+            raise FileNotFoundError(f"找不到 Evaluation Dataset 目录: {evaluation_dataset_dir}")
+        evaluation_manifest, validation_records = _load_dataset(evaluation_dataset_dir)
+        _validate_dataset_compatibility(dataset_manifest, evaluation_manifest)
+        if config.strict_token_budget:
+            sequence_length = dataset_manifest["config"]["sequence_length"]
+            train_records = [record for record in records if sum(record["loss_mask"]) == sequence_length]
+            excluded_train_records = [record for record in records if sum(record["loss_mask"]) != sequence_length]
+            if len(train_records) < config.batch_size:
+                raise ValueError("完整训练 Sequence 数量少于 batch_size，无法固定 Token 预算")
+        else:
+            train_records = records
+            excluded_train_records = []
+        split_mode = "external_evaluation_dataset"
+        split_note = "训练与评测来自独立 Dataset；strict_token_budget 可排除尾部 Padding Sequence"
 
     random.seed(config.seed)
     torch.manual_seed(config.seed)
@@ -221,6 +276,7 @@ def train_tiny_lm(dataset_dir: Path, output_dir: Path, config: TrainingConfig) -
     torch.set_num_threads(1)
 
     model = _build_model(dataset_manifest, config)
+    initial_model_state_sha256 = _state_sha256(model.state_dict())
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate)
     initial_train_loss = _evaluate(model, train_records, config.batch_size)
 
@@ -230,6 +286,7 @@ def train_tiny_lm(dataset_dir: Path, output_dir: Path, config: TrainingConfig) -
         batch_size=config.batch_size,
         shuffle=True,
         generator=loader_generator,
+        drop_last=config.strict_token_budget,
     )
     iterator = iter(train_loader)
     loss_history: list[float] = []
@@ -252,17 +309,27 @@ def train_tiny_lm(dataset_dir: Path, output_dir: Path, config: TrainingConfig) -
         loss_history.append(float(loss.item()))
         trained_token_count += int(loss_mask.sum().item())
     duration_seconds = time.perf_counter() - started_at
+    if config.strict_token_budget:
+        expected_token_count = config.steps * config.batch_size * dataset_manifest["config"]["sequence_length"]
+        if trained_token_count != expected_token_count:
+            raise RuntimeError("严格 Token 预算未得到满足")
 
     final_train_loss = _evaluate(model, train_records, config.batch_size)
     validation_loss = _evaluate(model, validation_records, config.batch_size)
     split = {
+        "mode": split_mode,
         "train_sequence_ids": [record["sequence_id"] for record in train_records],
-        "validation_sequence_ids": [record["sequence_id"] for record in validation_records],
-        "note": "Lab 02 按 Sequence 做确定性拆分，只用于本地训练闭环，不代表无文档泄漏的正式评测",
+        "excluded_train_sequence_ids": [record["sequence_id"] for record in excluded_train_records],
+        "evaluation_sequence_ids": [record["sequence_id"] for record in validation_records],
+        "note": split_note,
     }
+    evaluation_dataset_fingerprint = (
+        evaluation_manifest["pipeline_fingerprint"] if evaluation_manifest is not None else None
+    )
     semantic_run = {
         "training_version": TRAINING_VERSION,
         "dataset_fingerprint": dataset_manifest["pipeline_fingerprint"],
+        "evaluation_dataset_fingerprint": evaluation_dataset_fingerprint,
         "config": asdict(config),
         "split": split,
     }
@@ -277,28 +344,25 @@ def train_tiny_lm(dataset_dir: Path, output_dir: Path, config: TrainingConfig) -
             "training_version": TRAINING_VERSION,
             "run_fingerprint": run_fingerprint,
             "dataset_fingerprint": dataset_manifest["pipeline_fingerprint"],
+            "evaluation_dataset_fingerprint": evaluation_dataset_fingerprint,
             "step": config.steps,
             "training_config": asdict(config),
             "split": split,
+            "initial_model_state_sha256": initial_model_state_sha256,
             "model_state_dict": model_state,
             "optimizer_state_dict": optimizer.state_dict(),
         },
         checkpoint_path,
     )
 
-    sequences_name = dataset_manifest["artifacts"]["sequences"]
     run_manifest = {
         "schema_version": RUN_SCHEMA_VERSION,
         "training_version": TRAINING_VERSION,
         "run_fingerprint": run_fingerprint,
-        "dataset": {
-            "pipeline_fingerprint": dataset_manifest["pipeline_fingerprint"],
-            "sequences_sha256": dataset_manifest["artifact_sha256"]["sequences"],
-            "vocab_size": dataset_manifest["config"]["vocab_size_actual"],
-            "sequence_length": dataset_manifest["config"]["sequence_length"],
-            "sequence_count": dataset_manifest["metrics"]["sequence_count"],
-            "artifact": sequences_name,
-        },
+        "dataset": _dataset_section(dataset_manifest),
+        "evaluation_dataset": (
+            _dataset_section(evaluation_manifest) if evaluation_manifest is not None else None
+        ),
         "config": asdict(config),
         "split": split,
         "metrics": {
@@ -314,13 +378,18 @@ def train_tiny_lm(dataset_dir: Path, output_dir: Path, config: TrainingConfig) -
         "environment": {"device": "cpu", "torch_version": torch.__version__},
         "artifacts": {"checkpoint": checkpoint_path.name},
         "artifact_sha256": {"checkpoint": sha256_file(checkpoint_path)},
+        "initial_model_state_sha256": initial_model_state_sha256,
         "model_state_sha256": model_state_sha256,
     }
     _write_json(output_dir / "run_manifest.json", run_manifest)
     return run_manifest
 
 
-def validate_training_run(dataset_dir: Path, output_dir: Path) -> dict[str, Any]:
+def validate_training_run(
+    dataset_dir: Path,
+    output_dir: Path,
+    evaluation_dataset_dir: Path | None = None,
+) -> dict[str, Any]:
     """验证 Run Manifest、Dataset 绑定、Checkpoint 和重新加载后的 Loss。"""
 
     run_manifest_path = output_dir / "run_manifest.json"
@@ -334,10 +403,24 @@ def validate_training_run(dataset_dir: Path, output_dir: Path) -> dict[str, Any]
 
     dataset_manifest, records = _load_dataset(dataset_dir)
     dataset_section = run_manifest["dataset"]
-    if dataset_section["pipeline_fingerprint"] != dataset_manifest["pipeline_fingerprint"]:
-        raise ValueError("Run Manifest 未绑定到当前 Dataset Fingerprint")
-    if dataset_section["sequences_sha256"] != dataset_manifest["artifact_sha256"]["sequences"]:
-        raise ValueError("Run Manifest 中的 Sequence 哈希与 Dataset 不一致")
+    if dataset_section != _dataset_section(dataset_manifest):
+        raise ValueError("Run Manifest 未绑定到当前训练 Dataset")
+
+    evaluation_section = run_manifest.get("evaluation_dataset")
+    if evaluation_section is None:
+        if evaluation_dataset_dir is not None:
+            raise ValueError("当前 Run 使用内部拆分，不接受外部 Evaluation Dataset")
+        evaluation_manifest = None
+        evaluation_records = None
+        evaluation_dataset_fingerprint = None
+    else:
+        if evaluation_dataset_dir is None:
+            raise ValueError("当前 Run 需要提供外部 Evaluation Dataset")
+        evaluation_manifest, evaluation_records = _load_dataset(evaluation_dataset_dir)
+        _validate_dataset_compatibility(dataset_manifest, evaluation_manifest)
+        if evaluation_section != _dataset_section(evaluation_manifest):
+            raise ValueError("Run Manifest 未绑定到当前 Evaluation Dataset")
+        evaluation_dataset_fingerprint = evaluation_manifest["pipeline_fingerprint"]
 
     config = TrainingConfig(**run_manifest["config"])
     config.validate()
@@ -346,6 +429,7 @@ def validate_training_run(dataset_dir: Path, output_dir: Path) -> dict[str, Any]
         {
             "training_version": TRAINING_VERSION,
             "dataset_fingerprint": dataset_manifest["pipeline_fingerprint"],
+            "evaluation_dataset_fingerprint": evaluation_dataset_fingerprint,
             "config": asdict(config),
             "split": split,
         }
@@ -361,24 +445,48 @@ def validate_training_run(dataset_dir: Path, output_dir: Path) -> dict[str, Any]
         raise ValueError("Checkpoint 未绑定到当前 Run Fingerprint")
     if checkpoint["dataset_fingerprint"] != dataset_manifest["pipeline_fingerprint"]:
         raise ValueError("Checkpoint 未绑定到当前 Dataset Fingerprint")
+    if checkpoint["evaluation_dataset_fingerprint"] != evaluation_dataset_fingerprint:
+        raise ValueError("Checkpoint 未绑定到当前 Evaluation Dataset Fingerprint")
     if checkpoint["step"] != config.steps or checkpoint["training_config"] != asdict(config):
         raise ValueError("Checkpoint 的训练配置与 Run Manifest 不一致")
     if checkpoint["split"] != split:
         raise ValueError("Checkpoint 的数据拆分与 Run Manifest 不一致")
+    if checkpoint["initial_model_state_sha256"] != run_manifest["initial_model_state_sha256"]:
+        raise ValueError("Checkpoint 的初始模型状态与 Run Manifest 不一致")
 
+    torch.manual_seed(config.seed)
     model = _build_model(dataset_manifest, config)
+    if _state_sha256(model.state_dict()) != run_manifest["initial_model_state_sha256"]:
+        raise ValueError("无法根据 Seed 重建初始模型状态")
     model.load_state_dict(checkpoint["model_state_dict"])
     if _state_sha256(model.state_dict()) != run_manifest["model_state_sha256"]:
         raise ValueError("Checkpoint 模型状态哈希与 Run Manifest 不一致")
 
     records_by_id = {record["sequence_id"]: record for record in records}
     train_ids = split["train_sequence_ids"]
-    validation_ids = split["validation_sequence_ids"]
-    if set(train_ids) & set(validation_ids):
-        raise ValueError("训练集与验证集 Sequence 重叠")
-    if set(train_ids) | set(validation_ids) != set(records_by_id):
-        raise ValueError("Run Manifest 的数据拆分未完整覆盖 Dataset")
-    validation_records = [records_by_id[sequence_id] for sequence_id in validation_ids]
+    excluded_train_ids = split["excluded_train_sequence_ids"]
+    evaluation_ids = split["evaluation_sequence_ids"]
+    if set(train_ids) & set(excluded_train_ids):
+        raise ValueError("训练 Sequence 与排除 Sequence 重叠")
+    if split["mode"] == "internal_sequence_split":
+        if evaluation_records is not None or excluded_train_ids:
+            raise ValueError("内部拆分包含不兼容的外部评测或排除 Sequence")
+        if set(train_ids) & set(evaluation_ids):
+            raise ValueError("训练集与验证集 Sequence 重叠")
+        if set(train_ids) | set(evaluation_ids) != set(records_by_id):
+            raise ValueError("Run Manifest 的内部拆分未完整覆盖 Dataset")
+        validation_records = [records_by_id[sequence_id] for sequence_id in evaluation_ids]
+    elif split["mode"] == "external_evaluation_dataset":
+        if evaluation_records is None:
+            raise ValueError("外部评测拆分缺少 Evaluation Dataset")
+        if set(train_ids) | set(excluded_train_ids) != set(records_by_id):
+            raise ValueError("Run Manifest 的训练拆分未完整覆盖 Dataset")
+        evaluation_records_by_id = {record["sequence_id"]: record for record in evaluation_records}
+        if set(evaluation_ids) != set(evaluation_records_by_id):
+            raise ValueError("Run Manifest 的评测拆分未完整覆盖 Evaluation Dataset")
+        validation_records = [evaluation_records_by_id[sequence_id] for sequence_id in evaluation_ids]
+    else:
+        raise ValueError("Run Manifest 包含未知 split mode")
     reloaded_validation_loss = _evaluate(model, validation_records, config.batch_size)
     expected_validation_loss = run_manifest["metrics"]["validation_loss"]
     if not math.isclose(reloaded_validation_loss, expected_validation_loss, rel_tol=0, abs_tol=1e-6):
@@ -391,5 +499,6 @@ def validate_training_run(dataset_dir: Path, output_dir: Path) -> dict[str, Any]
         "initial_train_loss": run_manifest["metrics"]["initial_train_loss"],
         "final_train_loss": run_manifest["metrics"]["final_train_loss"],
         "validation_loss": expected_validation_loss,
+        "initial_model_state_sha256": run_manifest["initial_model_state_sha256"],
         "model_state_sha256": run_manifest["model_state_sha256"],
     }

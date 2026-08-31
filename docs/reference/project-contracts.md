@@ -1,6 +1,6 @@
 # 项目数据产物契约
 
-本文定义 v0.1 实验使用的数据结构。字段含义只在这里维护，教程不重复定义另一套口径。
+本文定义当前实验使用的数据结构。字段含义只在这里维护，教程不重复定义另一套口径。
 
 ## 原始文档 `raw_documents.jsonl`
 
@@ -74,12 +74,19 @@
 | `source_sha256` | 原始输入文件内容哈希 |
 | `tokenizer_sha256` | Tokenizer 文件内容哈希 |
 | `pipeline_fingerprint` | 输入、Tokenizer 和关键配置的联合指纹 |
-| `config` | 词表大小、序列长度和特殊 Token |
+| `config` | Tokenizer 模式、词表大小、序列长度和特殊 Token |
 | `metrics` | 文档、Token、Sequence、重复和 Packing 指标 |
 | `artifacts` | 产物的相对文件名 |
 | `artifact_sha256` | 规范化文档、Sequence 和 Tokenizer 的内容哈希 |
 
 Manifest 不包含生成时间、用户名、主机名和绝对路径。这些字段与数据语义无关，会破坏确定性。
+
+`config.tokenizer_mode` 取值：
+
+- `trained`：使用当前文档训练并保存 Tokenizer；
+- `reused`：复制并使用外部固定 Tokenizer，`vocab_size_requested` 为 `null`。
+
+Lab 03 使用 `reused` 保证 Baseline、Candidate 和 Evaluation 的 Token 语义完全一致。
 
 ## 训练运行 `run_manifest.json`
 
@@ -88,7 +95,7 @@ Lab 02 使用独立的 Run Manifest 把模型训练绑定到 Dataset Manifest：
 ```json
 {
   "schema_version": "0.1",
-  "training_version": "0.1.0",
+  "training_version": "0.2.0",
   "run_fingerprint": "...",
   "dataset": {
     "pipeline_fingerprint": "...",
@@ -96,14 +103,18 @@ Lab 02 使用独立的 Run Manifest 把模型训练绑定到 Dataset Manifest：
     "vocab_size": 320,
     "sequence_length": 64
   },
+  "evaluation_dataset": null,
   "config": {
     "steps": 100,
     "batch_size": 4,
-    "seed": 42
+    "seed": 42,
+    "strict_token_budget": false
   },
   "split": {
+    "mode": "internal_sequence_split",
     "train_sequence_ids": ["seq_00000000"],
-    "validation_sequence_ids": ["seq_00000001"]
+    "excluded_train_sequence_ids": [],
+    "evaluation_sequence_ids": ["seq_00000001"]
   },
   "metrics": {
     "initial_train_loss": 5.9,
@@ -111,6 +122,7 @@ Lab 02 使用独立的 Run Manifest 把模型训练绑定到 Dataset Manifest：
     "validation_loss": 6.0,
     "tokens_per_second": 1000.0
   },
+  "initial_model_state_sha256": "...",
   "model_state_sha256": "..."
 }
 ```
@@ -119,13 +131,20 @@ Lab 02 使用独立的 Run Manifest 把模型训练绑定到 Dataset Manifest：
 
 - `training_version`；
 - Dataset 的 `pipeline_fingerprint`；
+- 可选外部 Evaluation Dataset 的 `pipeline_fingerprint`；
 - 完整训练配置；
-- 训练/验证 Sequence 拆分。
+- 训练/评测 Sequence 拆分。
 
 运行时间和 Tokens/s 不进入 Run Fingerprint，因为它们随机器负载和硬件变化。模型状态使用独立哈希，
 用于判断相同数据、代码与训练配置是否得到相同参数。
 
+`initial_model_state_sha256` 不是直接相信随机种子，而是根据 Seed 重建模型后对所有 Tensor 内容计算哈希。
+Lab 03 要求两次 Run 的初始模型状态哈希完全相同。
+
 Lab 02 的拆分单位是 Sequence，只用于本地训练闭环。它不承诺文档级隔离，也不能作为正式泛化评测。
+
+Lab 03 设置 `evaluation_dataset` 和 `split.mode=external_evaluation_dataset`。当
+`strict_token_budget=true` 时，训练只使用无 Padding 的完整 Sequence，并通过 `drop_last` 保证每个 Step 消费相同 Token 数。
 
 ## Checkpoint `checkpoint.pt`
 
@@ -138,6 +157,45 @@ Checkpoint 包含：
 
 Run Manifest 同时记录 Checkpoint 文件哈希与模型状态哈希。前者检测文件是否被修改，后者检测重新加载后的模型参数。
 Lab 02 尚未保存调度器、随机状态和数据游标，因此只证明模型状态可以重新加载，不宣称支持精确断点续训。
+
+## 数据实验 `experiment_manifest.json`
+
+Lab 03 使用 Experiment Manifest 连接四个 Dataset 和两个 Training Run：
+
+```json
+{
+  "schema_version": "0.1",
+  "experiment_version": "0.1.0",
+  "experiment_fingerprint": "...",
+  "controlled_variable": {
+    "name": "training_corpus",
+    "expected_direction": null
+  },
+  "controls": {
+    "tokenizer_sha256": "...",
+    "evaluation_dataset_fingerprint": "...",
+    "trained_token_budget": 25600,
+    "initial_model_state_sha256": "..."
+  },
+  "runs": {
+    "baseline": {"evaluation_loss": 5.7},
+    "candidate": {"evaluation_loss": 6.2}
+  },
+  "comparison": {
+    "candidate_minus_baseline_evaluation_loss": 0.5
+  }
+}
+```
+
+Experiment Fingerprint 覆盖：
+
+- 输入文件哈希；
+- 受控变量定义；
+- Tokenizer、Evaluation Dataset、训练配置、Token 预算和初始模型状态；
+- 四个 Dataset Fingerprint；
+- 两个 Run Fingerprint。
+
+运行时间和吞吐不进入 Experiment Fingerprint。比较指标可以由两个 Run Manifest 重新计算，验证器不会相信手工填写的差值。
 
 ## 证据等级
 

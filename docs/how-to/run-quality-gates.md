@@ -9,7 +9,7 @@ make validate
 ```
 
 成功条件：命令退出码为 0，Lab 01 输出 `dataset validation passed`，Lab 02 输出
-`training run validation passed`。
+`training run validation passed`，Lab 03 输出 `data A/B validation passed`。
 
 ## 单独运行
 
@@ -19,6 +19,7 @@ make test
 make lab00
 make lab01
 make lab02
+make lab03
 ```
 
 ## 常见失败
@@ -70,6 +71,15 @@ uv run aide validate-training-run --dataset artifacts/lab01 --output artifacts/l
 ```
 
 如果 Dataset Fingerprint 已变化，应重新运行 Lab 02，不能把旧 Checkpoint 强行绑定到新数据版本。
+
+### Data A/B 验证失败
+
+```bash
+uv run aide validate-data-ab --output artifacts/lab03
+```
+
+验证器会逐层检查四个 Dataset、两个 Run、共享 Tokenizer、外部 Evaluation Dataset、初始模型状态和有效 Token 预算。
+不要直接编辑 `experiment_manifest.json` 修正数字，应重新运行产生该数字的 Dataset 或 Run。
 
 ### 依赖锁变化
 

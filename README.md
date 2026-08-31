@@ -75,6 +75,7 @@ make setup
 make lab00
 make lab01
 make lab02
+make lab03
 make validate
 ```
 
@@ -114,12 +115,16 @@ Dataset Manifest
 - `checkpoint.pt`：模型和优化器状态；
 - `run_manifest.json`：Dataset Fingerprint、训练配置、拆分、Loss、吞吐和模型状态哈希。
 
+`make lab03` 会在共享 Tokenizer、相同初始模型、固定有效 Token 预算和独立评测集下，比较干净训练语料与
+注入低信息近重复模板的数据版本，输出 `artifacts/lab03/experiment_manifest.json`。
+
 开始前建议依次阅读：
 
 1. [Lab 00：环境与证据边界](docs/tutorials/00-environment.md)
 2. [Lab 01：从文档到训练 Token](docs/tutorials/01-document-to-token.md)
 3. [Lab 02：Tiny LLM 基线训练](docs/tutorials/02-tiny-llm-baseline.md)
-4. [数据产物契约](docs/reference/project-contracts.md)
+4. [Lab 03：受控数据版本 A/B](docs/tutorials/03-controlled-data-ab.md)
+5. [数据产物契约](docs/reference/project-contracts.md)
 
 ## 项目演进结构
 
@@ -128,7 +133,7 @@ Dataset Manifest
 | 0 | 环境、证据等级、项目方法 | 环境报告 | 可运行 |
 | 1 | 文档到 Token | Manifest、Tokenizer、Sequence | 可运行 |
 | 2 | Tiny LLM 基线 | Loss、Tokens/s、Checkpoint | 可运行 |
-| 3 | 最小数据版本 A/B | 受控变量实验报告 | 规划中 |
+| 3 | 最小数据版本 A/B | 受控变量实验报告 | 可运行 |
 | 4 | 质量、污染与近似去重 | 质量报告、去重索引 | 规划中 |
 | 5 | 数据混合、Packing 与 Sharding | 可复现训练数据版本 | 规划中 |
 | 6 | smallpond、Partition 与 Shuffle | 分布式加工 Pipeline | 规划中 |

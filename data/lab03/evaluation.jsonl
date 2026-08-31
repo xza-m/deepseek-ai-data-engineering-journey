@@ -1,0 +1,8 @@
+{"source_id":"eval-001","text":"为什么训练数据版本必须记录 Tokenizer 和处理配置？","metadata":{"split":"evaluation","license":"project-original"}}
+{"source_id":"eval-002","text":"如何区分训练 Loss 下降与模型在独立数据上的泛化改善？","metadata":{"split":"evaluation","license":"project-original"}}
+{"source_id":"eval-003","text":"受控的数据实验应当固定哪些模型、数据和训练条件？","metadata":{"split":"evaluation","license":"project-original"}}
+{"source_id":"eval-004","text":"近似重复和评测污染会怎样影响训练数据与模型评测？","metadata":{"split":"evaluation","license":"project-original"}}
+{"source_id":"eval-005","text":"Dataset Manifest 如何把训练 Sequence 追溯到原始来源？","metadata":{"split":"evaluation","license":"project-original"}}
+{"source_id":"eval-006","text":"DataLoader 等待比例与训练 Tokens per Second 有什么关系？","metadata":{"split":"evaluation","license":"project-original"}}
+{"source_id":"eval-007","text":"Checkpoint 恢复为什么还要保存随机状态和数据游标？","metadata":{"split":"evaluation","license":"project-original"}}
+{"source_id":"eval-008","text":"smallpond 与 3FS 分别解决 AI 数据链路中的什么问题？","metadata":{"split":"evaluation","license":"project-original"}}

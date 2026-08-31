@@ -7,6 +7,7 @@
 - [Lab 00：环境与证据边界](tutorials/00-environment.md)
 - [Lab 01：从文档到训练 Token](tutorials/01-document-to-token.md)
 - [Lab 02：Tiny LLM 基线训练](tutorials/02-tiny-llm-baseline.md)
+- [Lab 03：受控数据版本 A/B](tutorials/03-controlled-data-ab.md)
 
 Tutorial 会带领你完成一个具体结果。第一次学习请不要跳过步骤。
 

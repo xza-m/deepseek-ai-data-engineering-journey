@@ -1,0 +1,12 @@
+{"source_id":"tok-001","text":"AI 数据工程把原始文档转换为可训练、可追溯的数据版本。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-002","text":"Tokenizer 将文本编码为 Token，词表和特殊符号属于数据契约。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-003","text":"Document Packing 提高有效 Token 比例，同时必须保留文档边界。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-004","text":"Dataset Manifest 记录输入哈希、配置、产物和 Pipeline Fingerprint。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-005","text":"Run Manifest 把训练配置、数据版本、Checkpoint 和模型指标连接起来。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-006","text":"受控实验一次只改变一个主要变量，并固定评测集和训练预算。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-007","text":"训练 Loss 下降只能证明模型拟合训练数据，不能直接证明泛化能力。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-008","text":"近似重复、评测污染、PII 和来源许可属于训练数据治理问题。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-009","text":"Partition、Shuffle 和数据倾斜决定大规模语料加工的计算效率。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-010","text":"DataLoader Wait 和 Tokens per Second 描述数据供给与训练消费的关系。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-011","text":"Checkpoint 恢复需要模型、优化器、随机状态和数据游标保持一致。","metadata":{"purpose":"tokenizer","license":"project-original"}}
+{"source_id":"tok-012","text":"smallpond 和 3FS 是理解 AI 数据计算与存储协同的公开技术锚点。","metadata":{"purpose":"tokenizer","license":"project-original"}}

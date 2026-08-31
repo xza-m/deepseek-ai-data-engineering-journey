@@ -73,6 +73,54 @@ def test_training_validator_detects_corrupted_checkpoint(tmp_path: Path) -> None
         validate_training_run(dataset_dir, output_dir)
 
 
+def test_external_evaluation_uses_fixed_token_budget(tmp_path: Path) -> None:
+    dataset_dir = _build_test_dataset(tmp_path)
+    evaluation_source = tmp_path / "evaluation.jsonl"
+    evaluation_records = [
+        {
+            "source_id": f"eval-{index}",
+            "text": f"Held out evaluation sample {index} checks independent model loss and lineage.",
+            "metadata": {"split": "evaluation"},
+        }
+        for index in range(4)
+    ]
+    evaluation_source.write_text(
+        "".join(json.dumps(record, ensure_ascii=False) + "\n" for record in evaluation_records),
+        encoding="utf-8",
+    )
+    evaluation_dataset_dir = tmp_path / "evaluation-dataset"
+    build_dataset(
+        evaluation_source,
+        evaluation_dataset_dir,
+        vocab_size=280,
+        sequence_length=16,
+        tokenizer_path=dataset_dir / "tokenizer.json",
+    )
+    config = TrainingConfig(
+        steps=8,
+        batch_size=2,
+        learning_rate=1e-2,
+        embedding_dim=16,
+        num_layers=1,
+        num_heads=4,
+        feed_forward_dim=32,
+        seed=7,
+        strict_token_budget=True,
+    )
+
+    run = train_tiny_lm(
+        dataset_dir,
+        tmp_path / "external-run",
+        config,
+        evaluation_dataset_dir=evaluation_dataset_dir,
+    )
+
+    assert run["split"]["mode"] == "external_evaluation_dataset"
+    assert run["evaluation_dataset"]["pipeline_fingerprint"]
+    assert run["metrics"]["trained_token_count"] == config.steps * config.batch_size * 16
+    validate_training_run(dataset_dir, tmp_path / "external-run", evaluation_dataset_dir)
+
+
 def test_training_config_rejects_incompatible_attention_heads() -> None:
     config = TrainingConfig(embedding_dim=10, num_heads=4)
 
