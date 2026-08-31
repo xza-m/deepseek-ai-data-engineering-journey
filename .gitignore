@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# Local data and generated artifacts
+data/
+artifacts/
+work/
+
+# Tooling and operating system
+.DS_Store
+.idea/
+.vscode/
