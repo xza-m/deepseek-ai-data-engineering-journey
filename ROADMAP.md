@@ -4,6 +4,9 @@
 Data + AI 职业转型路线。默认每周投入 8～10 小时，在不脱离日常工作的前提下，持续建设同一个
 Mini-LLM Data Factory。
 
+16 周指 16 个能力阶段。完成第 4 周后，可以插入一次 8～10 小时的 Bridge 01 源码强化周；选择该路径时，
+总日历约为 17 周，但后续能力阶段和验收门槛不变。
+
 路线不以“看完多少论文”或“学会多少新框架”为完成标准。16 周结束时，你需要能够独立交付、解释和复现：
 
 ```text
@@ -151,6 +154,22 @@ Mini-LLM Data Factory。
 **产出**：第一份数据版本 A/B 报告。
 
 **晋级门槛**：能够区分实验变量、控制变量和混杂因素，并把结论限定在当前数据规模与训练预算内。
+
+### Bridge 01：DeepSeek 源码与论文强化周
+
+**定位**：在进入具体质量算法前，把已经运行的本地链路映射到 DeepSeek-V3、smallpond 和 3FS 的官方证据。
+
+- 从 DeepSeek-V3 的数据构造与训练并行反推数据系统工作负载；
+- 追踪 smallpond 的 `DataFrame → Node → Optimizer → Planner → Task`；
+- 追踪 3FS 的 Metadata Service、FoundationDB、Storage Service、CRAQ 和 Client；
+- 用 Dataset、Run、Experiment Manifest 完成本地责任映射；
+- 做一次 Go / No-Go 架构评审，区分源码理解、本地实验和集群证据。
+
+**产出**：工作负载卡、smallpond 调用链、3FS 元数据/数据路径图、本地架构评审。
+
+**晋级门槛**：闭卷验收达到 16/20，且没有把官方集群数字、源码理解或架构推演冒充成本地验证。
+
+完整步骤见 [Bridge 01 教程](docs/tutorials/bridge-01-deepseek-source-study.md)。
 
 ### 第 5 周：近似去重与评测污染
 

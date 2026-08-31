@@ -25,6 +25,12 @@
 
 后续只在代码和测试可以一起提交时创建新 Lab 目录。
 
+## 当前学习入口
+
+完成 Lab 03 后，先完成
+[Bridge 01：DeepSeek 源码与论文强化周](../docs/tutorials/bridge-01-deepseek-source-study.md)，再进入 Lab 04。
+Bridge 只补充源码证据、架构映射和个人学习产物，不伪装成一个已经实现的新 Lab。
+
 ## 当前开发优先级
 
 1. Lab 04：加入近似去重、污染检测和质量策略，并回到 A/B 验证；

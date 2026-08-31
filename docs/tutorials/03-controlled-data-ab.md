@@ -167,4 +167,8 @@ uv run aide run-data-ab \
 - Sequence 级 Loss 足以替代下游能力评测；
 - 近似去重算法的 Precision、Recall 或最佳阈值。
 
+进入 Lab 04 前，推荐先完成
+[Bridge 01：DeepSeek 源码与论文强化周](bridge-01-deepseek-source-study.md)，把当前本地闭环映射到论文、smallpond 和 3FS 的
+真实源码边界。
+
 最后一项正是 Lab 04 要解决的问题：先建立近似重复真值集和检测指标，再回到本 A/B 框架验证过滤策略。

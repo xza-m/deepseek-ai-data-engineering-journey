@@ -8,6 +8,7 @@
 - [Lab 01：从文档到训练 Token](tutorials/01-document-to-token.md)
 - [Lab 02：Tiny LLM 基线训练](tutorials/02-tiny-llm-baseline.md)
 - [Lab 03：受控数据版本 A/B](tutorials/03-controlled-data-ab.md)
+- [Bridge 01：DeepSeek 源码与论文强化周](tutorials/bridge-01-deepseek-source-study.md)
 
 Tutorial 会带领你完成一个具体结果。第一次学习请不要跳过步骤。
 
@@ -21,12 +22,14 @@ How-to 假设你已经理解基本概念，只提供解决问题的操作路径�
 
 - [项目数据产物契约](reference/project-contracts.md)
 - [DeepSeek 源码与论文阅读索引](reference/reading-list.md)
+- [DeepSeek 源码学习笔记模板](reference/source-study-note-template.md)
 
 Reference 用于查询，不要求顺序阅读。
 
 ## Explanation：我想理解为什么
 
 - [DeepSeek 数据—计算—存储—训练链路](explanation/deepseek-data-stack.md)
+- [smallpond、3FS 与 LLM 工作负载如何连接](explanation/smallpond-3fs-llm-workload.md)
 - [从传统数据工程到 AI 数据工程](explanation/from-data-engineer-to-ai-data-engineer.md)
 
 Explanation 讨论关系、原理和取舍，不替代动手实验。

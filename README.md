@@ -63,6 +63,10 @@ Data + AI 底层深入的人。我们以 DeepSeek 的
 路线采用螺旋式学习：先用小数据接通完整链路，再依次增加数据质量、规模、故障和基础设施复杂度。
 每个阶段都回到同一个问题——这次数据或系统变化，是否真实影响了模型指标、训练效率或工程成本？
 
+完成 Lab 03 后，推荐插入一次 8～10 小时的
+[DeepSeek 源码与论文强化周](docs/tutorials/bridge-01-deepseek-source-study.md)。它不改变 16 个能力阶段的顺序；
+选择完整强化路径时，总日历约为 17 周。
+
 ## 开始第一条端到端链路
 
 本地要求：macOS 或 Linux、Git，以及可以安装 Python 3.11 的 `uv`。
@@ -124,7 +128,8 @@ Dataset Manifest
 2. [Lab 01：从文档到训练 Token](docs/tutorials/01-document-to-token.md)
 3. [Lab 02：Tiny LLM 基线训练](docs/tutorials/02-tiny-llm-baseline.md)
 4. [Lab 03：受控数据版本 A/B](docs/tutorials/03-controlled-data-ab.md)
-5. [数据产物契约](docs/reference/project-contracts.md)
+5. [Bridge 01：DeepSeek 源码与论文强化周](docs/tutorials/bridge-01-deepseek-source-study.md)
+6. [数据产物契约](docs/reference/project-contracts.md)
 
 ## 项目演进结构
 
@@ -134,6 +139,7 @@ Dataset Manifest
 | 1 | 文档到 Token | Manifest、Tokenizer、Sequence | 可运行 |
 | 2 | Tiny LLM 基线 | Loss、Tokens/s、Checkpoint | 可运行 |
 | 3 | 最小数据版本 A/B | 受控变量实验报告 | 可运行 |
+| B1 | DeepSeek 源码与论文强化 | 源码调用链、架构评审 | 可学习 |
 | 4 | 质量、污染与近似去重 | 质量报告、去重索引 | 规划中 |
 | 5 | 数据混合、Packing 与 Sharding | 可复现训练数据版本 | 规划中 |
 | 6 | smallpond、Partition 与 Shuffle | 分布式加工 Pipeline | 规划中 |
