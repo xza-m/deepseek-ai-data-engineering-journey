@@ -2,10 +2,16 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.ruff_cache/
 .venv/
+dist/
+build/
+*.egg-info/
 
 # Local data and generated artifacts
-data/
+data/raw/
+data/interim/
+data/processed/
 artifacts/
 work/
 

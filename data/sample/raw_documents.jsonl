@@ -1,0 +1,10 @@
+{"source_id":"doc-001","text":"传统数据工程关注表、分区、任务和指标口径。AI 数据工程还要追踪文档如何变成 Token、Sequence 与训练 Loss。","metadata":{"domain":"data-engineering","language":"zh","license":"project-authored"}}
+{"source_id":"doc-002","text":"一个可复现的数据版本需要记录来源哈希、清洗规则、Tokenizer、随机种子、Packing 配置和产物指纹。","metadata":{"domain":"data-governance","language":"zh","license":"project-authored"}}
+{"source_id":"doc-003","text":"For an LLM training pipeline, storage throughput matters only after sample semantics, ordering, and lineage are correct.","metadata":{"domain":"llm-systems","language":"en","license":"project-authored"}}
+{"source_id":"doc-004","text":"二次方程 x² - 5x + 6 = 0 可以分解为 (x - 2)(x - 3) = 0，因此两个根是 2 和 3。","metadata":{"domain":"math","language":"zh","license":"project-authored"}}
+{"source_id":"doc-005","text":"def stable_partition(rows, key):\n    return sorted(rows, key=lambda row: row[key])\n\n稳定的数据分区需要明确 Key、分区数和倾斜处理策略。","metadata":{"domain":"code","language":"mixed","license":"project-authored"}}
+{"source_id":"doc-006","text":"smallpond 将分区内计算交给 DuckDB，并使用任务调度扩展到多个 Worker。学习重点是逻辑计划、Partition、Shuffle 和共享存储边界。","metadata":{"domain":"smallpond","language":"zh","license":"project-authored"}}
+{"source_id":"doc-007","text":"3FS 面向训练数据随机读取、并行 Checkpoint 和推理 KV Cache 等 I/O 模式。文件系统性能不能替代数据质量与治理。","metadata":{"domain":"3fs","language":"zh","license":"project-authored"}}
+{"source_id":"doc-008","text":"Document Packing 可以减少 Padding 浪费，但必须保留文档边界并明确是否允许跨文档 Attention。","metadata":{"domain":"tokenization","language":"mixed","license":"project-authored"}}
+{"source_id":"doc-009","text":"数据质量实验必须固定模型、训练预算和评测，只改变一个数据变量，才能解释模型差异来自哪里。","metadata":{"domain":"evaluation","language":"zh","license":"project-authored"}}
+{"source_id":"doc-009-duplicate","text":"  数据质量实验必须固定模型、训练预算和评测，只改变一个数据变量，才能解释模型差异来自哪里。  ","metadata":{"domain":"evaluation","language":"zh","license":"project-authored"}}
