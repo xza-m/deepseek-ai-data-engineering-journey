@@ -203,6 +203,12 @@ Lab 04 的 Quality Fingerprint 覆盖训练、评测和真值输入哈希，Shin
 逐文档 `quality_audit` 必须记录接受/拒绝决策和原因。Precision/Recall 只在显式标注 Pair 上计算，未标注 Pair 不得被
 偷偷当成负例。污染候选与质量拒绝是两个不同概念：前者保护评测隔离，后者决定训练数据准入。
 
+## 数据版本 `dataset_version_manifest.json`
+
+Lab 05 把 Quality Fingerprint、接受文档、领域 Mix Spec、Tokenizer、Packed Sequence 和 Training Shard 绑定为同一版本。
+Shard 必须按记录顺序无损还原 Dataset 中的全部 Sequence；`sequence_lineage.jsonl` 必须对每个 Sequence 恰好覆盖一次，
+并保留 Source ID、Domain、Quality Version 和 Token Span。Dataset Card 是面向人的解释，不能代替机器可重算的 Fingerprint。
+
 ## 证据等级
 
 | 等级 | 需要的证据 |

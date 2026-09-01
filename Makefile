@@ -1,6 +1,6 @@
 PYTHON := uv run python
 
-.PHONY: setup lint test lab00 lab01 lab02 lab03 lab04 validate clean
+.PHONY: setup lint test lab00 lab01 lab02 lab03 lab04 lab05 validate clean
 
 setup:
 	uv sync --python 3.11 --extra dev --extra train
@@ -51,7 +51,19 @@ lab04: lab03
 		--truth data/lab04/duplicate_truth.jsonl \
 		--output artifacts/lab04
 
-validate: lint test lab00 lab01 lab02 lab03 lab04
+lab05: lab04
+	uv run aide build-version \
+		--input artifacts/lab04/accepted_documents.jsonl \
+		--quality-report artifacts/lab04/quality_report.json \
+		--mix-spec data/lab05/mix_spec.json \
+		--output artifacts/lab05
+	uv run aide validate-version \
+		--input artifacts/lab04/accepted_documents.jsonl \
+		--quality-report artifacts/lab04/quality_report.json \
+		--mix-spec data/lab05/mix_spec.json \
+		--output artifacts/lab05
+
+validate: lint test lab00 lab01 lab02 lab03 lab04 lab05
 
 clean:
 	rm -rf artifacts .pytest_cache .ruff_cache

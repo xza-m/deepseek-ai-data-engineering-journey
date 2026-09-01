@@ -88,6 +88,22 @@ def _create_parser() -> argparse.ArgumentParser:
     validate_quality_parser.add_argument("--evaluation", type=Path, required=True)
     validate_quality_parser.add_argument("--truth", type=Path, required=True)
     validate_quality_parser.add_argument("--output", type=Path, required=True)
+
+    version_parser = commands.add_parser("build-version", help="执行 Lab 05 混合、Packing 与 Sharding")
+    version_parser.add_argument("--input", type=Path, required=True)
+    version_parser.add_argument("--quality-report", type=Path, required=True)
+    version_parser.add_argument("--mix-spec", type=Path, required=True)
+    version_parser.add_argument("--output", type=Path, required=True)
+    version_parser.add_argument("--vocab-size", type=int, default=320)
+    version_parser.add_argument("--sequence-length", type=int, default=64)
+    version_parser.add_argument("--max-sequences-per-shard", type=int, default=4)
+    version_parser.add_argument("--seed", type=int, default=42)
+
+    validate_version_parser = commands.add_parser("validate-version", help="验证 Lab 05 Dataset Version")
+    validate_version_parser.add_argument("--input", type=Path, required=True)
+    validate_version_parser.add_argument("--quality-report", type=Path, required=True)
+    validate_version_parser.add_argument("--mix-spec", type=Path, required=True)
+    validate_version_parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -230,6 +246,32 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = validate_quality_audit(args.train, args.evaluation, args.truth, args.output)
         print("quality audit validation passed")
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "build-version":
+        from ai_data_engineering.dataset_version import VersionConfig, build_dataset_version
+
+        result = build_dataset_version(
+            args.input,
+            args.quality_report,
+            args.mix_spec,
+            args.output,
+            VersionConfig(
+                vocab_size=args.vocab_size,
+                sequence_length=args.sequence_length,
+                max_sequences_per_shard=args.max_sequences_per_shard,
+                seed=args.seed,
+            ),
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "validate-version":
+        from ai_data_engineering.dataset_version import validate_dataset_version
+
+        result = validate_dataset_version(args.input, args.quality_report, args.mix_spec, args.output)
+        print("dataset version validation passed")
         print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 

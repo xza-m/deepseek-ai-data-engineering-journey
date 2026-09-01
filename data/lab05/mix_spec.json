@@ -1,0 +1,9 @@
+{
+  "domain_weights": {
+    "data-engineering": 0.125,
+    "distributed-compute": 0.125,
+    "governance": 0.375,
+    "llm-training": 0.25,
+    "storage": 0.125
+  }
+}
