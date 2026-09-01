@@ -24,8 +24,8 @@ Data + AI 底层深入的人。我们以 DeepSeek 的
 ```
 
 这个仓库不是为零基础学生设计的课堂，也不是 RAG、Prompt 或 Agent 应用开发合集。它是一条可以与日常工作
-并行推进的工程实践路线：用 16 周完成一个持续演进的 Mini-LLM Data Factory，并把每个阶段沉淀成可以复现、
-讲解和开源的职业作品。
+并行推进的工程实践路线：按自己的节奏持续演进同一个 Mini-LLM Data Factory，并把每个能力关卡沉淀成可以复现、
+讲解和开源的职业作品。进度由证据决定，不由学习周期决定。
 
 ## 适合谁
 
@@ -58,14 +58,15 @@ Data + AI 底层深入的人。我们以 DeepSeek 的
     → 正式的数据版本—训练—评测—归因—数据改进闭环
 ```
 
-完整能力地图见 [知识地图](docs/knowledge-map.md)，学习节奏见 [16 周路线](ROADMAP.md)。
+第一次学习请从唯一入口 [START_HERE.md](START_HERE.md) 开始；完整能力地图见
+[知识地图](docs/knowledge-map.md)，关卡目标与验收见 [自主节奏能力关卡路线](ROADMAP.md)。
 
 路线采用螺旋式学习：先用小数据接通完整链路，再依次增加数据质量、规模、故障和基础设施复杂度。
 每个阶段都回到同一个问题——这次数据或系统变化，是否真实影响了模型指标、训练效率或工程成本？
 
-完成 Lab 03 后，推荐插入一次 8～10 小时的
-[DeepSeek 源码与论文强化周](docs/tutorials/bridge-01-deepseek-source-study.md)。它不改变 16 个能力阶段的顺序；
-选择完整强化路径时，总日历约为 17 周。
+通过语义关后，进入
+[DeepSeek 源码与论文连接](docs/tutorials/bridge-01-deepseek-source-study.md)，把已经运行的本地链路映射到
+DeepSeek-V3、smallpond 和 3FS 的官方证据，再继续治理关。任务顺序固定，完成周期由学习者自行安排。
 
 ## 开始第一条端到端链路
 
@@ -77,12 +78,10 @@ cd deepseek-ai-data-engineering-journey
 
 make setup
 make lab00
-make lab01
-make lab02
-make lab03
-make journey
-make validate
 ```
+
+先检查 `artifacts/lab00/environment.json` 并完成起点关验收，再按
+[自主节奏能力关卡路线](ROADMAP.md) 一次推进一个 Lab。`make journey` 和 `make validate` 只用于完成全部关卡后的独立复现、维护验证或 CI，不是初次学习入口。
 
 `make lab01` 会执行一条真实的最小训练数据链路：
 
@@ -121,18 +120,14 @@ Dataset Manifest
 - `run_manifest.json`：Dataset Fingerprint、训练配置、拆分、Loss、吞吐和模型状态哈希。
 
 `make lab03` 会在共享 Tokenizer、相同初始模型、固定有效 Token 预算和独立评测集下，比较干净训练语料与
-注入低信息近重复模板的数据版本。`make journey` 会继续执行 Lab 04～10，直到正式多 Seed A/B、失败归因和
-毕业复现 Manifest。
+注入低信息近重复模板的数据版本。后续 Lab 会逐关扩展到治理、规模、训练供给、存储以及正式多 Seed A/B，
+最终生成失败归因和毕业复现 Manifest。
 
-开始前建议依次阅读：
+开始前只需确认三个入口：
 
-1. [Lab 00：环境与证据边界](docs/tutorials/00-environment.md)
-2. [Lab 01：从文档到训练 Token](docs/tutorials/01-document-to-token.md)
-3. [Lab 02：Tiny LLM 基线训练](docs/tutorials/02-tiny-llm-baseline.md)
-4. [Lab 03：受控数据版本 A/B](docs/tutorials/03-controlled-data-ab.md)
-5. [Bridge 01：DeepSeek 源码与论文强化周](docs/tutorials/bridge-01-deepseek-source-study.md)
-6. [数据产物契约](docs/reference/project-contracts.md)
-7. [Lab 04～10 实验索引](labs/README.md)
+1. [从这里开始](START_HERE.md)：学习方式、自我定位和第一次运行；
+2. [自主节奏能力关卡路线](ROADMAP.md)：关卡目标、产物和晋级门槛；
+3. [实验索引](labs/README.md)：需要查找某个 Lab 的命令和教程时使用。
 
 ## 项目演进结构
 
@@ -142,7 +137,7 @@ Dataset Manifest
 | 1 | 文档到 Token | Manifest、Tokenizer、Sequence | 可运行 |
 | 2 | Tiny LLM 基线 | Loss、Tokens/s、Checkpoint | 可运行 |
 | 3 | 最小数据版本 A/B | 受控变量实验报告 | 可运行 |
-| B1 | DeepSeek 源码与论文强化 | 源码调用链、架构评审 | 可学习 |
+| B1 | DeepSeek 源码与论文连接 | 源码调用链、架构评审 | 可学习 |
 | 4 | 质量、污染与近似去重 | 质量报告、去重索引 | 可运行 |
 | 5 | 数据混合、Packing 与 Sharding | 可复现训练数据版本 | 可运行 |
 | 6 | smallpond、Partition 与 Shuffle | 本地计算、倾斜与恢复证据 | 可运行 |

@@ -1,6 +1,6 @@
 # 文档导航
 
-项目文档按照 Diátaxis 分为四类。先判断自己的目标，再选择入口。
+项目文档按照 Diátaxis 分为四类。第一次学习从 [START_HERE](../START_HERE.md) 进入；本页用于按文档类型查找资料。
 
 ## Tutorials：我想按顺序学习
 
@@ -8,7 +8,7 @@
 - [Lab 01：从文档到训练 Token](tutorials/01-document-to-token.md)
 - [Lab 02：Tiny LLM 基线训练](tutorials/02-tiny-llm-baseline.md)
 - [Lab 03：受控数据版本 A/B](tutorials/03-controlled-data-ab.md)
-- [Bridge 01：DeepSeek 源码与论文强化周](tutorials/bridge-01-deepseek-source-study.md)
+- [Bridge 01：DeepSeek 源码与论文连接](tutorials/bridge-01-deepseek-source-study.md)
 - [Lab 04：近似去重、评测污染与质量治理](tutorials/04-quality-dedup-contamination.md)
 - [Lab 05：确定性混合、Packing 与 Sharding](tutorials/05-mixing-packing-sharding.md)
 - [Lab 06：Partition、Shuffle、倾斜与恢复](tutorials/06-partition-shuffle-recovery.md)
@@ -30,6 +30,7 @@ How-to 假设你已经理解基本概念，只提供解决问题的操作路径�
 - [项目数据产物契约](reference/project-contracts.md)
 - [DeepSeek 源码与论文阅读索引](reference/reading-list.md)
 - [DeepSeek 源码学习笔记模板](reference/source-study-note-template.md)
+- [学习证据记录模板](reference/learning-evidence-template.md)
 
 Reference 用于查询，不要求顺序阅读。
 
@@ -44,4 +45,4 @@ Explanation 讨论关系、原理和取舍，不替代动手实验。
 ## 总览
 
 - [AI 数据工程知识地图](knowledge-map.md)
-- [16 周学习路线](../ROADMAP.md)
+- [自主节奏能力关卡路线](../ROADMAP.md)

@@ -2,7 +2,7 @@
 
 阅读顺序遵循“先工作负载，再计算，再存储，最后进入实现细节”。不要从 3FS C++ 文件树第一页开始硬读。
 
-第一次阅读请直接完成 [Bridge 01：DeepSeek 源码与论文强化周](../tutorials/bridge-01-deepseek-source-study.md)。
+第一次阅读请直接完成 [Bridge 01：DeepSeek 源码与论文连接](../tutorials/bridge-01-deepseek-source-study.md)。
 本索引用于之后查找准确入口，不替代教程。
 
 ## 版本与证据约定
@@ -102,7 +102,7 @@ Checkpoint/KV Cache → 存储工作负载
 - FUSE 的低接入成本和原生接口的性能分别适用于什么场景？
 - 失效检测、Lease、Chain 版本和数据恢复如何协作？
 
-源码只定位职责，不要求本周通读实现：
+源码只定位职责，不要求一次通读实现：
 
 - `src/mgmtd/`：成员、路由、Chain Table 和 Lease；
 - `src/meta/`：文件系统语义和 FoundationDB 元数据；

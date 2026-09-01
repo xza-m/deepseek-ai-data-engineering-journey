@@ -1,6 +1,6 @@
-# Bridge 01：DeepSeek 源码与论文强化周
+# Bridge 01：DeepSeek 源码与论文连接
 
-这是 Lab 03 和 Lab 04 之间的一次五日强化学习。它不增加新的数据处理功能，而是用
+这是语义关和治理关之间的一座源码桥。它不增加新的数据处理功能，而是用
 [DeepSeek-V3 Technical Report](https://arxiv.org/abs/2412.19437)、
 [smallpond](https://github.com/deepseek-ai/smallpond) 和
 [3FS](https://github.com/deepseek-ai/3FS) 回看已经运行过的 Mini-LLM Data Factory。
@@ -9,7 +9,7 @@
 
 ## 适用对象与目标
 
-本教程面向已经完成 Lab 00～03、熟悉 SQL、ETL、数仓或数据平台的在职工程师。预计投入 8～10 小时，分五天完成。
+本教程面向已经完成 Lab 00～03、熟悉 SQL、ETL、数仓或数据平台的在职工程师。五个任务按知识依赖排列，完成周期由个人决定。
 
 最终要交付四类个人学习证据：
 
@@ -18,7 +18,7 @@
 3. 3FS 元数据与数据路径图；
 4. 当前本地项目的架构评审和差距清单。
 
-本周明确不做：
+本关明确不做：
 
 - 在 macOS 上部署或模拟生产级 3FS；
 - 逐行通读 smallpond 或 3FS 全部源码；
@@ -52,25 +52,24 @@
 
 ## 准备本地证据目录
 
-先确认 Lab 00～03 仍然通过：
+先重新生成并验证 Lab 03 的受控实验：
 
 ```bash
-make validate
+make lab03
+uv run aide validate-data-ab --output artifacts/lab03
 ```
 
 学习笔记放在被 `.gitignore` 忽略的 `artifacts/` 中，避免未完成的个人理解直接进入公共文档：
 
 ```bash
-mkdir -p artifacts/study-sprint
+mkdir -p artifacts/source-study
 
-for day in 01 02 03 04 05; do
-  cp docs/reference/source-study-note-template.md "artifacts/study-sprint/day-${day}.md"
+for task in 01 02 03 04 05; do
+  cp docs/reference/source-study-note-template.md "artifacts/source-study/task-${task}.md"
 done
 ```
 
-## Day 1：从 LLM 工作负载反推数据系统
-
-**时间预算**：90 分钟阅读，30 分钟本地对照。
+## 任务一：从 LLM 工作负载反推数据系统
 
 ### 阅读范围
 
@@ -99,7 +98,7 @@ jq '{controls, runs, comparison, evidence_boundary, experiment_fingerprint}' \
   artifacts/lab03/experiment_manifest.json
 ```
 
-在 `day-01.md` 中完成一张对照表：
+在 `task-01.md` 中完成一张对照表：
 
 | 维度 | DeepSeek-V3 报告 | 本地 Lab 00～03 | 不能外推的结论 |
 | --- | --- | --- | --- |
@@ -108,13 +107,11 @@ jq '{controls, runs, comparison, evidence_boundary, experiment_fingerprint}' \
 | Sequence | 预训练 4K | 默认 64 | I/O 和显存压力不可等同 |
 | 训练并行 | PP、EP、ZeRO-1 DP | 单进程 CPU | 不能声称验证了分布式效率 |
 
-### 当日验收
+### 任务验收
 
 不看资料回答：为什么 AI 数据工程需要同时记录 Document、Token、Sequence 和训练预算，而不能只记录“处理了多少行”？
 
-## Day 2：追踪 smallpond 从 DataFrame 到 Task
-
-**时间预算**：60 分钟源码，60 分钟调用链和迁移分析。
+## 任务二：追踪 smallpond 从 DataFrame 到 Task
 
 ### 获取固定源码
 
@@ -180,17 +177,15 @@ Task 内擅长的 SQL/列式计算，smallpond 负责跨 Partition 的计划、�
 - 为什么 SQL 语义正确，不代表分布式执行就高效或可执行？
 - Shuffle 中间文件为什么既是 I/O 成本，也是失败恢复边界？
 
-### 当日验收
+### 任务验收
 
-在 `day-02.md` 画出一张包含 Node、Task、Partition 和中间文件的调用链，并为每个箭头附一个源码路径。
+在 `task-02.md` 画出一张包含 Node、Task、Partition 和中间文件的调用链，并为每个箭头附一个源码路径。
 
-## Day 3：追踪 3FS 的元数据路径和数据路径
-
-**时间预算**：60 分钟设计文档，60 分钟源码入口与工作负载推演。
+## 任务三：追踪 3FS 的元数据路径和数据路径
 
 ### 获取固定源码
 
-3FS 仓库较大，本周只稀疏检出关键目录，不初始化第三方子模块：
+3FS 仓库较大，本任务只稀疏检出关键目录，不初始化第三方子模块：
 
 ```bash
 git clone --filter=blob:none --no-checkout \
@@ -252,7 +247,7 @@ rg -n "class (StorageClient|StorageServer|StorageService)|Reliable(Update|Forwar
 
 ### FUSE 和 USRBIO 的取舍
 
-在 `day-03.md` 完成下表：
+在 `task-03.md` 完成下表：
 
 | 场景 | 优先接口 | 原因 | 仍需验证的指标 |
 | --- | --- | --- | --- |
@@ -260,13 +255,11 @@ rg -n "class (StorageClient|StorageServer|StorageService)|Reliable(Update|Forwar
 | DataLoader 小块随机读 | 评估 USRBIO | 批处理异步 I/O，减少 FUSE 路径开销 | P99、IOPS、Batch Wait |
 | 大模型 Checkpoint | 按写入模式评估 | 需要高吞吐并行写 | 写入时间、恢复时间、失败语义 |
 
-### 当日验收
+### 任务验收
 
 闭卷解释：为什么 3FS 可以提供共享文件数据平面，但不能替代 Dataset Catalog、许可治理、质量规则和样本血缘？
 
-## Day 4：映射到本地 Mini-LLM Data Factory
-
-**时间预算**：45 分钟代码追踪，75 分钟架构映射。
+## 任务四：映射到本地 Mini-LLM Data Factory
 
 先定位当前本地职责：
 
@@ -299,15 +292,13 @@ jq '{datasets, controls, runs, comparison, experiment_fingerprint}' \
 2. 如果 Lab 09 把本地 SSD 换成共享文件系统，哪些路径可以变化，哪些数据版本语义不能变化？
 3. 当训练 Tokens/s 下降时，如何区分数据格式、CPU 处理、DataLoader、存储和 GPU 通信问题？
 
-### 当日验收
+### 任务验收
 
-在 `day-04.md` 输出一张端到端架构图，每层必须标注“已实现”“源码理解”或“待实验”，禁止用一张图把三者冒充成同一证据等级。
+在 `task-04.md` 输出一张端到端架构图，每层必须标注“已实现”“源码理解”或“待实验”，禁止用一张图把三者冒充成同一证据等级。
 
-## Day 5：做一次架构评审，而不是读书总结
+## 任务五：做一次架构评审，而不是读书总结
 
-**时间预算**：60 分钟评审，30 分钟闭卷问题，30 分钟修订。
-
-在 `day-05.md` 完成以下评审：
+在 `task-05.md` 完成以下评审：
 
 ### 1. 工作负载
 
@@ -348,7 +339,7 @@ jq '{datasets, controls, runs, comparison, experiment_fingerprint}' \
 
 ## 晋级门槛
 
-完成强化周后，你应当能给另一位数据工程师讲清楚：
+完成源码桥后，你应当能给另一位数据工程师讲清楚：
 
 ```text
 模型目标和训练并行定义工作负载
@@ -360,4 +351,3 @@ jq '{datasets, controls, runs, comparison, experiment_fingerprint}' \
 ```
 
 如果只能复述组件名、无法给出源码路径、本地 Manifest 或证据边界，就先补齐笔记，不要急着进入下一阶段。
-

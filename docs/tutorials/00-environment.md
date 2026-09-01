@@ -45,18 +45,13 @@ python3 -m json.tool artifacts/lab00/environment.json
 
 macOS 上 `threefs_native_ready` 应为 `false`。这不是失败，而是提醒你：3FS 原生集群实验需要 Linux，并且真实性能研究还需要 NVMe 与 RDMA 环境。
 
-## 3. 运行质量门禁
+## 3. 检查当前关卡
 
 ```bash
-make validate
+python3 -m json.tool artifacts/lab00/environment.json
 ```
 
-它依次运行：
-
-1. 静态检查；
-2. 单元测试；
-3. 环境报告；
-4. Lab 01 数据构建与产物验证。
+确认报告能够解析，并核对 Python、操作系统和可选基础设施能力。全量 `make validate` 会运行后续实验，只在完成主线后的最终复现或维护仓库时使用。
 
 ## 4. 建立证据语言
 
@@ -74,6 +69,6 @@ make validate
 ## 验收
 
 - `artifacts/lab00/environment.json` 存在且内容可解析；
-- `make validate` 通过；
+- `artifacts/lab00/environment.json` 可以被解析并完成能力核对；
 - 能解释为什么本机不能完成生产级 3FS 验证；
 - 后续笔记能够使用统一证据标签。
