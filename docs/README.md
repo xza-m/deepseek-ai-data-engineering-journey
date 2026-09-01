@@ -11,6 +11,7 @@
 - [Bridge 01：DeepSeek 源码与论文强化周](tutorials/bridge-01-deepseek-source-study.md)
 - [Lab 04：近似去重、评测污染与质量治理](tutorials/04-quality-dedup-contamination.md)
 - [Lab 05：确定性混合、Packing 与 Sharding](tutorials/05-mixing-packing-sharding.md)
+- [Lab 06：Partition、Shuffle、倾斜与恢复](tutorials/06-partition-shuffle-recovery.md)
 
 Tutorial 会带领你完成一个具体结果。第一次学习请不要跳过步骤。
 

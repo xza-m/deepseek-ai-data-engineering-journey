@@ -17,7 +17,7 @@
 | 03 | 最小数据版本 A/B | 可运行 | [教程](../docs/tutorials/03-controlled-data-ab.md) |
 | 04 | 质量、污染与近似去重 | 可运行 | [教程](../docs/tutorials/04-quality-dedup-contamination.md) |
 | 05 | 数据混合、Packing 与 Sharding | 可运行 | [教程](../docs/tutorials/05-mixing-packing-sharding.md) |
-| 06 | smallpond Partition、Shuffle 与故障 | 规格已定义 | [路线第 7～9 周](../ROADMAP.md) |
+| 06 | smallpond Partition、Shuffle 与故障 | 可运行 | [教程](../docs/tutorials/06-partition-shuffle-recovery.md) |
 | 07 | DataLoader 与 I/O | 规格已定义 | [路线第 10、13 周](../ROADMAP.md) |
 | 08 | Checkpoint 与训练恢复 | 规格已定义 | [路线第 11～12 周](../ROADMAP.md) |
 | 09 | 3FS 架构与 I/O | 规格已定义 | [路线第 13～14 周](../ROADMAP.md) |
@@ -28,13 +28,13 @@
 ## 当前学习入口
 
 完成 Lab 03 后，先完成
-[Bridge 01：DeepSeek 源码与论文强化周](../docs/tutorials/bridge-01-deepseek-source-study.md)，再进入 Lab 04。
-Bridge 只补充源码证据、架构映射和个人学习产物，不伪装成一个已经实现的新 Lab。
+[Bridge 01：DeepSeek 源码与论文强化周](../docs/tutorials/bridge-01-deepseek-source-study.md)，再按编号继续。
+Bridge 补充源码证据、架构映射和个人学习产物，不替代后续真实 Lab。
 
 ## 当前开发优先级
 
-1. Lab 04：加入近似去重、污染检测和质量策略，并回到 A/B 验证；
-2. Lab 05：建立可复现的数据混合和训练 Shard；
-3. Lab 06：用 DuckDB 和 smallpond 扩展数据加工规模。
+1. Lab 07：建立 Map/Iterable DataLoader 的供给指标；
+2. Lab 08：验证 Checkpoint 精确恢复；
+3. Lab 09～10：补齐存储决策与正式多 Seed 数据实验。
 
 这个顺序优先建立反馈闭环。不能因为后续模块更“底层”或更新颖，就跳过训练基线和受控实验。

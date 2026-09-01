@@ -238,7 +238,6 @@ def build_dataset_version(
         "dataset_version": DATASET_VERSION_VERSION,
         "inputs": {
             "accepted_documents_sha256": sha256_file(input_path),
-            "quality_report_sha256": sha256_file(quality_report_path),
             "quality_fingerprint": quality_report["quality_fingerprint"],
             "mix_spec_sha256": sha256_file(mix_spec_path),
         },
@@ -291,7 +290,6 @@ def validate_dataset_version(
         raise ValueError("不支持的 Dataset Version 版本")
     expected_inputs = {
         "accepted_documents_sha256": sha256_file(input_path),
-        "quality_report_sha256": sha256_file(quality_report_path),
         "quality_fingerprint": json.loads(quality_report_path.read_text(encoding="utf-8"))["quality_fingerprint"],
         "mix_spec_sha256": sha256_file(mix_spec_path),
     }

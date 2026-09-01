@@ -104,6 +104,18 @@ def _create_parser() -> argparse.ArgumentParser:
     validate_version_parser.add_argument("--quality-report", type=Path, required=True)
     validate_version_parser.add_argument("--mix-spec", type=Path, required=True)
     validate_version_parser.add_argument("--output", type=Path, required=True)
+
+    compute_parser = commands.add_parser("run-compute", help="执行 Lab 06 DuckDB、分区、倾斜与恢复实验")
+    compute_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
+    compute_parser.add_argument("--output", type=Path, required=True)
+    compute_parser.add_argument("--repeat-factor", type=int, default=64)
+    compute_parser.add_argument("--partition-count", type=int, default=8)
+    compute_parser.add_argument("--hot-key-fraction", type=float, default=0.75)
+    compute_parser.add_argument("--failure-partition", type=int, default=3)
+
+    validate_compute_parser = commands.add_parser("validate-compute", help="验证 Lab 06 计算实验")
+    validate_compute_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
+    validate_compute_parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -272,6 +284,30 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = validate_dataset_version(args.input, args.quality_report, args.mix_spec, args.output)
         print("dataset version validation passed")
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "run-compute":
+        from ai_data_engineering.compute_lab import ComputeConfig, run_compute_lab
+
+        result = run_compute_lab(
+            args.input,
+            args.output,
+            ComputeConfig(
+                repeat_factor=args.repeat_factor,
+                partition_count=args.partition_count,
+                hot_key_fraction=args.hot_key_fraction,
+                failure_partition=args.failure_partition,
+            ),
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "validate-compute":
+        from ai_data_engineering.compute_lab import validate_compute_lab
+
+        result = validate_compute_lab(args.input, args.output)
+        print("compute lab validation passed")
         print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 

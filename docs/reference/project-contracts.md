@@ -208,6 +208,7 @@ Lab 04 的 Quality Fingerprint 覆盖训练、评测和真值输入哈希，Shin
 Lab 05 把 Quality Fingerprint、接受文档、领域 Mix Spec、Tokenizer、Packed Sequence 和 Training Shard 绑定为同一版本。
 Shard 必须按记录顺序无损还原 Dataset 中的全部 Sequence；`sequence_lineage.jsonl` 必须对每个 Sequence 恰好覆盖一次，
 并保留 Source ID、Domain、Quality Version 和 Token Span。Dataset Card 是面向人的解释，不能代替机器可重算的 Fingerprint。
+Quality Report 的运行耗时属于观测值，不进入 Dataset Version，避免相同语义输入重复执行时产生版本漂移。
 
 ## 证据等级
 

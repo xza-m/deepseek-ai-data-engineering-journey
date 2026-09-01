@@ -11,6 +11,7 @@ requires-python = ">=3.10,<3.13"
 license = { file = "LICENSE" }
 authors = [{ name = "xza-m" }]
 dependencies = [
+  "duckdb>=1.1,<2",
   "tokenizers>=0.20,<1",
 ]
 

@@ -1,6 +1,6 @@
 PYTHON := uv run python
 
-.PHONY: setup lint test lab00 lab01 lab02 lab03 lab04 lab05 validate clean
+.PHONY: setup lint test lab00 lab01 lab02 lab03 lab04 lab05 lab06 validate clean
 
 setup:
 	uv sync --python 3.11 --extra dev --extra train
@@ -63,7 +63,15 @@ lab05: lab04
 		--mix-spec data/lab05/mix_spec.json \
 		--output artifacts/lab05
 
-validate: lint test lab00 lab01 lab02 lab03 lab04 lab05
+lab06: lab05
+	uv run aide run-compute \
+		--input artifacts/lab05 \
+		--output artifacts/lab06
+	uv run aide validate-compute \
+		--input artifacts/lab05 \
+		--output artifacts/lab06
+
+validate: lint test lab00 lab01 lab02 lab03 lab04 lab05 lab06
 
 clean:
 	rm -rf artifacts .pytest_cache .ruff_cache
