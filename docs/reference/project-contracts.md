@@ -210,6 +210,12 @@ Shard 必须按记录顺序无损还原 Dataset 中的全部 Sequence；`sequenc
 并保留 Source ID、Domain、Quality Version 和 Token Span。Dataset Card 是面向人的解释，不能代替机器可重算的 Fingerprint。
 Quality Report 的运行耗时属于观测值，不进入 Dataset Version，避免相同语义输入重复执行时产生版本漂移。
 
+## DataLoader 报告 `dataloader_report.json`
+
+Lab 07 绑定 Dataset Version、Compute Fingerprint 与每个 Training Shard 哈希。`profiles` 只记录可重算的 Sample、
+有效 Token、唯一 Sequence 和 Batch 数；首批等待、P50/P99 与吞吐属于机器观测，放在 `observations` 中，
+不进入 DataLoader Fingerprint。
+
 ## 证据等级
 
 | 等级 | 需要的证据 |

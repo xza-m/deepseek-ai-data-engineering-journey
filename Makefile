@@ -1,6 +1,6 @@
 PYTHON := uv run python
 
-.PHONY: setup lint test lab00 lab01 lab02 lab03 lab04 lab05 lab06 validate clean
+.PHONY: setup lint test lab00 lab01 lab02 lab03 lab04 lab05 lab06 lab07 validate clean
 
 setup:
 	uv sync --python 3.11 --extra dev --extra train
@@ -71,7 +71,17 @@ lab06: lab05
 		--input artifacts/lab05 \
 		--output artifacts/lab06
 
-validate: lint test lab00 lab01 lab02 lab03 lab04 lab05 lab06
+lab07: lab06
+	uv run aide profile-dataloader \
+		--input artifacts/lab05 \
+		--compute-report artifacts/lab06/compute_report.json \
+		--output artifacts/lab07
+	uv run aide validate-dataloader \
+		--input artifacts/lab05 \
+		--compute-report artifacts/lab06/compute_report.json \
+		--output artifacts/lab07
+
+validate: lint test lab00 lab01 lab02 lab03 lab04 lab05 lab06 lab07
 
 clean:
 	rm -rf artifacts .pytest_cache .ruff_cache

@@ -116,6 +116,19 @@ def _create_parser() -> argparse.ArgumentParser:
     validate_compute_parser = commands.add_parser("validate-compute", help="验证 Lab 06 计算实验")
     validate_compute_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
     validate_compute_parser.add_argument("--output", type=Path, required=True)
+
+    dataloader_parser = commands.add_parser("profile-dataloader", help="执行 Lab 07 DataLoader Profile")
+    dataloader_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
+    dataloader_parser.add_argument("--compute-report", type=Path, required=True)
+    dataloader_parser.add_argument("--output", type=Path, required=True)
+    dataloader_parser.add_argument("--batch-size", type=int, default=4)
+    dataloader_parser.add_argument("--repeat-epochs", type=int, default=32)
+    dataloader_parser.add_argument("--worker-count", type=int, action="append")
+
+    validate_dataloader_parser = commands.add_parser("validate-dataloader", help="验证 Lab 07 DataLoader Profile")
+    validate_dataloader_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
+    validate_dataloader_parser.add_argument("--compute-report", type=Path, required=True)
+    validate_dataloader_parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -308,6 +321,40 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = validate_compute_lab(args.input, args.output)
         print("compute lab validation passed")
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "profile-dataloader":
+        try:
+            from ai_data_engineering.dataloader_lab import DataLoaderConfig, run_dataloader_lab
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
+            raise
+
+        result = run_dataloader_lab(
+            args.input,
+            args.compute_report,
+            args.output,
+            DataLoaderConfig(
+                batch_size=args.batch_size,
+                repeat_epochs=args.repeat_epochs,
+                worker_counts=tuple(args.worker_count or (0, 2)),
+            ),
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "validate-dataloader":
+        try:
+            from ai_data_engineering.dataloader_lab import validate_dataloader_lab
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
+            raise
+
+        result = validate_dataloader_lab(args.input, args.compute_report, args.output)
+        print("dataloader validation passed")
         print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 
