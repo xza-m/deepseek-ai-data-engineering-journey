@@ -72,6 +72,22 @@ def _create_parser() -> argparse.ArgumentParser:
 
     validate_experiment_parser = commands.add_parser("validate-data-ab", help="验证 Lab 03 A/B 实验")
     validate_experiment_parser.add_argument("--output", type=Path, required=True)
+
+    quality_parser = commands.add_parser("audit-quality", help="执行 Lab 04 近似去重、污染与质量审计")
+    quality_parser.add_argument("--train", type=Path, required=True)
+    quality_parser.add_argument("--evaluation", type=Path, required=True)
+    quality_parser.add_argument("--truth", type=Path, required=True)
+    quality_parser.add_argument("--output", type=Path, required=True)
+    quality_parser.add_argument("--similarity-threshold", type=float, default=0.45)
+    quality_parser.add_argument("--contamination-threshold", type=float, default=0.45)
+    quality_parser.add_argument("--shingle-size", type=int, default=3)
+    quality_parser.add_argument("--min-characters", type=int, default=40)
+
+    validate_quality_parser = commands.add_parser("validate-quality", help="验证 Lab 04 质量审计")
+    validate_quality_parser.add_argument("--train", type=Path, required=True)
+    validate_quality_parser.add_argument("--evaluation", type=Path, required=True)
+    validate_quality_parser.add_argument("--truth", type=Path, required=True)
+    validate_quality_parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -188,6 +204,32 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = validate_data_ab(args.output)
         print("data A/B validation passed")
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "audit-quality":
+        from ai_data_engineering.quality import QualityConfig, run_quality_audit
+
+        result = run_quality_audit(
+            args.train,
+            args.evaluation,
+            args.truth,
+            args.output,
+            QualityConfig(
+                similarity_threshold=args.similarity_threshold,
+                contamination_threshold=args.contamination_threshold,
+                shingle_size=args.shingle_size,
+                min_characters=args.min_characters,
+            ),
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "validate-quality":
+        from ai_data_engineering.quality import validate_quality_audit
+
+        result = validate_quality_audit(args.train, args.evaluation, args.truth, args.output)
+        print("quality audit validation passed")
         print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 

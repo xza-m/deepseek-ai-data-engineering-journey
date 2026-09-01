@@ -9,6 +9,7 @@
 - [Lab 02：Tiny LLM 基线训练](tutorials/02-tiny-llm-baseline.md)
 - [Lab 03：受控数据版本 A/B](tutorials/03-controlled-data-ab.md)
 - [Bridge 01：DeepSeek 源码与论文强化周](tutorials/bridge-01-deepseek-source-study.md)
+- [Lab 04：近似去重、评测污染与质量治理](tutorials/04-quality-dedup-contamination.md)
 
 Tutorial 会带领你完成一个具体结果。第一次学习请不要跳过步骤。
 

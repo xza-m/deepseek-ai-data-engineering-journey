@@ -15,7 +15,7 @@
 | 01 | 文档到训练 Token | 可运行 | [教程](../docs/tutorials/01-document-to-token.md) |
 | 02 | Tiny LLM 基线训练 | 可运行 | [教程](../docs/tutorials/02-tiny-llm-baseline.md) |
 | 03 | 最小数据版本 A/B | 可运行 | [教程](../docs/tutorials/03-controlled-data-ab.md) |
-| 04 | 质量、污染与近似去重 | 规格已定义 | [路线第 5～6 周](../ROADMAP.md) |
+| 04 | 质量、污染与近似去重 | 可运行 | [教程](../docs/tutorials/04-quality-dedup-contamination.md) |
 | 05 | 数据混合、Packing 与 Sharding | 规格已定义 | [路线第 6 周](../ROADMAP.md) |
 | 06 | smallpond Partition、Shuffle 与故障 | 规格已定义 | [路线第 7～9 周](../ROADMAP.md) |
 | 07 | DataLoader 与 I/O | 规格已定义 | [路线第 10、13 周](../ROADMAP.md) |

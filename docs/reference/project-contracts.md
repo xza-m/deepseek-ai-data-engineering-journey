@@ -197,6 +197,12 @@ Experiment Fingerprint 覆盖：
 
 运行时间和吞吐不进入 Experiment Fingerprint。比较指标可以由两个 Run Manifest 重新计算，验证器不会相信手工填写的差值。
 
+## 质量报告 `quality_report.json`
+
+Lab 04 的 Quality Fingerprint 覆盖训练、评测和真值输入哈希，Shingle/阈值与质量规则、重算指标，以及全部审计产物哈希。
+逐文档 `quality_audit` 必须记录接受/拒绝决策和原因。Precision/Recall 只在显式标注 Pair 上计算，未标注 Pair 不得被
+偷偷当成负例。污染候选与质量拒绝是两个不同概念：前者保护评测隔离，后者决定训练数据准入。
+
 ## 证据等级
 
 | 等级 | 需要的证据 |
