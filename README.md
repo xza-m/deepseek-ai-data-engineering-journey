@@ -80,6 +80,7 @@ make lab00
 make lab01
 make lab02
 make lab03
+make journey
 make validate
 ```
 
@@ -120,7 +121,8 @@ Dataset Manifest
 - `run_manifest.json`：Dataset Fingerprint、训练配置、拆分、Loss、吞吐和模型状态哈希。
 
 `make lab03` 会在共享 Tokenizer、相同初始模型、固定有效 Token 预算和独立评测集下，比较干净训练语料与
-注入低信息近重复模板的数据版本，输出 `artifacts/lab03/experiment_manifest.json`。
+注入低信息近重复模板的数据版本。`make journey` 会继续执行 Lab 04～10，直到正式多 Seed A/B、失败归因和
+毕业复现 Manifest。
 
 开始前建议依次阅读：
 
@@ -130,6 +132,7 @@ Dataset Manifest
 4. [Lab 03：受控数据版本 A/B](docs/tutorials/03-controlled-data-ab.md)
 5. [Bridge 01：DeepSeek 源码与论文强化周](docs/tutorials/bridge-01-deepseek-source-study.md)
 6. [数据产物契约](docs/reference/project-contracts.md)
+7. [Lab 04～10 实验索引](labs/README.md)
 
 ## 项目演进结构
 
@@ -140,15 +143,16 @@ Dataset Manifest
 | 2 | Tiny LLM 基线 | Loss、Tokens/s、Checkpoint | 可运行 |
 | 3 | 最小数据版本 A/B | 受控变量实验报告 | 可运行 |
 | B1 | DeepSeek 源码与论文强化 | 源码调用链、架构评审 | 可学习 |
-| 4 | 质量、污染与近似去重 | 质量报告、去重索引 | 规划中 |
-| 5 | 数据混合、Packing 与 Sharding | 可复现训练数据版本 | 规划中 |
-| 6 | smallpond、Partition 与 Shuffle | 分布式加工 Pipeline | 规划中 |
-| 7 | DataLoader 与 I/O | 等待时间和吞吐诊断 | 规划中 |
-| 8 | Checkpoint 与恢复 | 可恢复训练实验 | 规划中 |
-| 9 | 3FS 架构与 I/O | 设计推演、可选 Linux 集群实验 | 规划中 |
-| 10 | 正式反馈闭环与毕业项目 | 数据—模型归因报告、复现脚本 | 规划中 |
+| 4 | 质量、污染与近似去重 | 质量报告、去重索引 | 可运行 |
+| 5 | 数据混合、Packing 与 Sharding | 可复现训练数据版本 | 可运行 |
+| 6 | smallpond、Partition 与 Shuffle | 本地计算、倾斜与恢复证据 | 可运行 |
+| 7 | DataLoader 与 I/O | 等待时间和吞吐诊断 | 可运行 |
+| 8 | Checkpoint 与恢复 | 精确恢复实验 | 可运行 |
+| 9 | 3FS 架构与 I/O | 本地 I/O 与 3FS Go/No-Go | 可运行 |
+| 10 | 正式反馈闭环与毕业项目 | 多 Seed 归因报告、复现 Manifest | 可运行 |
 
-“规划中”代表学习目标和验收已定义，不代表代码已经实现。我们不会用占位页面冒充完成。
+全部必修主线均已实现。`smallpond` 分布式 Runtime、3FS 集群、RDMA/NVMe 和多 GPU 仍是条件化 Infra 支线；
+本项目会明确标注它们没有在普通本地环境中被验证。
 
 ## 文档导航
 

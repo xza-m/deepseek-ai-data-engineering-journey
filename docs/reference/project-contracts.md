@@ -228,6 +228,12 @@ Lab 09 绑定 Dataset、Compute 和 Recovery Fingerprint，分别定义顺序 Sh
 Checkpoint 并行写。操作数和逻辑 Bytes 进入稳定版本；P50/P99、吞吐和环境能力属于观测。未部署 3FS 时，
 报告必须显式保存 `cluster_executed=false`，架构理解不能替代集群基准。
 
+## 毕业报告 `graduation_report.json`
+
+Lab 10 以 Dataset Admission Policy Version 为唯一变量，执行多 Seed A/B。Graduation Fingerprint 绑定 Quality、
+Dataset Version、Compute、DataLoader、Recovery、Storage 六个上游 Fingerprint，以及训练控制、数据输入、
+Seed 结果、聚合指标、失败 Sequence 血缘和产物路径。机器复现与人工复现分开记录；CI 通过不能冒充真实学习者记录。
+
 ## 证据等级
 
 | 等级 | 需要的证据 |

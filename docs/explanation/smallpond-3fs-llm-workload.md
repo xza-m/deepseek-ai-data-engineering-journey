@@ -108,17 +108,18 @@ flowchart TB
 
 ## 映射到本地项目
 
-当前 Mini-LLM Data Factory 已经实现最小的语义闭环：
+当前 Mini-LLM Data Factory 已经实现本地必修闭环：
 
-| 本地模块 | 已实现证据 | 对应的上游启发 | 后续阶段 |
+| 本地模块 | 已实现证据 | 对应的上游启发 | Lab |
 | --- | --- | --- | --- |
-| `pipeline.py` | Tokenizer、Packing、Dataset Manifest | DeepSeek-V3 数据构造 | Lab 04/05 |
-| `training.py` | DataLoader、Loss、Checkpoint、Run Manifest | 训练框架消费数据版本 | Lab 07/08 |
-| `experiment.py` | 固定预算的数据 A/B | 数据变化必须由模型反馈验证 | Lab 04/10 |
-| 尚未实现的分布式计算 | 无集群实验证据 | smallpond Plan/Partition/Task | Lab 06 |
-| 尚未实现的共享存储 | macOS 不具备 3FS 原生证据 | 3FS I/O 工作负载和文件语义 | Lab 09 |
+| `pipeline.py` / `dataset_version.py` | Tokenizer、Packing、Shard、Dataset Manifest | DeepSeek-V3 数据构造 | 01、05 |
+| `quality.py` | 质量准入、近似重复、污染与真值评估 | 训练数据治理 | 04 |
+| `compute_lab.py` | DuckDB Plan、Partition、Shuffle、倾斜与恢复 | smallpond Plan/Partition/Task | 06 |
+| `dataloader_lab.py` / `recovery.py` | 数据供给 Profile 与精确恢复 | 训练框架消费与可靠性 | 07、08 |
+| `storage_lab.py` | 四类本地 I/O 和 3FS Go/No-Go | 3FS 工作负载和文件语义 | 09 |
+| `graduation.py` | 多 Seed 固定预算 A/B 与失败血缘 | 数据变化必须由模型反馈验证 | 10 |
 
-这意味着未来替换执行引擎或存储介质时，Manifest 不应该消失。相反，它需要继续绑定：
+替换执行引擎或存储介质时，Manifest 不应该消失。相反，它需要继续绑定：
 
 ```text
 Source Version
@@ -150,4 +151,3 @@ Source Version
 5. 只有在 Linux、NVMe、RDMA 和多节点条件满足时，才把 3FS 集群结果标为自己的实验。
 
 这条顺序符合 KISS 和 YAGNI：先保住可验证的数据—模型主线，再用真实瓶颈决定系统复杂度。
-

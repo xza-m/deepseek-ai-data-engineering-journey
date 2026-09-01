@@ -157,6 +157,18 @@ def _create_parser() -> argparse.ArgumentParser:
     validate_storage_parser.add_argument("--compute", type=Path, required=True, help="Lab 06 产物目录")
     validate_storage_parser.add_argument("--recovery", type=Path, required=True, help="Lab 08 产物目录")
     validate_storage_parser.add_argument("--output", type=Path, required=True)
+
+    graduation_parser = commands.add_parser("run-graduation", help="执行 Lab 10 多 Seed A/B 与毕业报告")
+    graduation_parser.add_argument("--data", type=Path, required=True, help="项目 data 目录")
+    graduation_parser.add_argument("--artifacts", type=Path, required=True, help="项目 artifacts 目录")
+    graduation_parser.add_argument("--output", type=Path, required=True)
+    graduation_parser.add_argument("--seed", type=int, action="append")
+    graduation_parser.add_argument("--steps", type=int, default=60)
+
+    validate_graduation_parser = commands.add_parser("validate-graduation", help="验证 Lab 10 毕业闭环")
+    validate_graduation_parser.add_argument("--data", type=Path, required=True, help="项目 data 目录")
+    validate_graduation_parser.add_argument("--artifacts", type=Path, required=True, help="项目 artifacts 目录")
+    validate_graduation_parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -438,6 +450,44 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = validate_storage_lab(args.input, args.compute, args.recovery, args.output)
         print("storage validation passed")
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "run-graduation":
+        try:
+            from ai_data_engineering.graduation import GraduationConfig, run_graduation_lab
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
+            raise
+
+        result = run_graduation_lab(
+            args.data,
+            args.artifacts,
+            args.output,
+            GraduationConfig(seeds=tuple(args.seed or (11, 29, 47)), steps=args.steps),
+        )
+        summary = {
+            "graduation_fingerprint": result["graduation_fingerprint"],
+            "seed_count": result["aggregate"]["seed_count"],
+            "mean_evaluation_loss_delta": result["aggregate"][
+                "candidate_minus_baseline_evaluation_loss_mean"
+            ],
+            "failure_example_count": len(result["failure_examples"]),
+        }
+        print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "validate-graduation":
+        try:
+            from ai_data_engineering.graduation import validate_graduation_lab
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
+            raise
+
+        result = validate_graduation_lab(args.data, args.artifacts, args.output)
+        print("graduation validation passed")
         print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 

@@ -8,8 +8,8 @@
 make validate
 ```
 
-成功条件：命令退出码为 0，Lab 01 输出 `dataset validation passed`，Lab 02 输出
-`training run validation passed`，Lab 03 输出 `data A/B validation passed`。
+成功条件：命令退出码为 0，全部测试通过，Lab 00～10 的构建与验证均成功，最后输出
+`graduation validation passed`。
 
 ## 单独运行
 
@@ -20,6 +20,14 @@ make lab00
 make lab01
 make lab02
 make lab03
+make lab04
+make lab05
+make lab06
+make lab07
+make lab08
+make lab09
+make lab10
+make journey
 ```
 
 ## 常见失败
@@ -53,7 +61,7 @@ make lab01
 
 ### 训练依赖未安装
 
-Lab 02 使用独立的训练依赖：
+Lab 02、03、07、08、10 使用独立的训练依赖：
 
 ```bash
 uv sync --extra train

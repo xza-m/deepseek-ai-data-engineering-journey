@@ -15,6 +15,7 @@
 - [Lab 07：DataLoader 与训练数据供给](tutorials/07-dataloader-io.md)
 - [Lab 08：Checkpoint 精确恢复与并行数据契约](tutorials/08-checkpoint-exact-recovery.md)
 - [Lab 09：从 LLM I/O 工作负载理解 3FS](tutorials/09-3fs-storage-workloads.md)
+- [Lab 10：正式数据 A/B、失败归因与毕业复现](tutorials/10-graduation-feedback-loop.md)
 
 Tutorial 会带领你完成一个具体结果。第一次学习请不要跳过步骤。
 

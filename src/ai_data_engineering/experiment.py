@@ -91,6 +91,8 @@ def run_data_ab(
     vocab_size: int,
     sequence_length: int,
     training_config: TrainingConfig,
+    controlled_variable: dict[str, Any] | None = None,
+    hypothesis: str | None = None,
 ) -> dict[str, Any]:
     """构建三个固定 Tokenizer Dataset，运行两次训练并输出 A/B Manifest。"""
 
@@ -164,16 +166,18 @@ def run_data_ab(
     if baseline_token_count != candidate_token_count:
         raise RuntimeError("A/B 两次训练没有使用相同的有效 Token 预算")
 
+    controlled_variable = controlled_variable or {
+        "name": "training_corpus",
+        "baseline": "项目原创的 AI 数据工程干净样例",
+        "candidate": "注入低信息重复模板的训练样例",
+        "expected_direction": None,
+    }
+    hypothesis = hypothesis or "在固定 Tokenizer、模型、初始化、Token 预算和评测集时，训练语料变化可能改变评测 Loss"
     manifest = {
         "schema_version": EXPERIMENT_SCHEMA_VERSION,
         "experiment_version": EXPERIMENT_VERSION,
-        "hypothesis": "在固定 Tokenizer、模型、初始化、Token 预算和评测集时，训练语料变化可能改变评测 Loss",
-        "controlled_variable": {
-            "name": "training_corpus",
-            "baseline": "项目原创的 AI 数据工程干净样例",
-            "candidate": "注入低信息重复模板的训练样例",
-            "expected_direction": None,
-        },
+        "hypothesis": hypothesis,
+        "controlled_variable": controlled_variable,
         "inputs": input_hashes,
         "controls": {
             "tokenizer_sha256": tokenizer_manifest["tokenizer_sha256"],
