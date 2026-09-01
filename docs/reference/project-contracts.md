@@ -216,6 +216,12 @@ Lab 07 绑定 Dataset Version、Compute Fingerprint 与每个 Training Shard 哈
 有效 Token、唯一 Sequence 和 Batch 数；首批等待、P50/P99 与吞吐属于机器观测，放在 `observations` 中，
 不进入 DataLoader Fingerprint。
 
+## 恢复报告 `recovery_report.json`
+
+Lab 08 的 Checkpoint 必须保存 Model、Optimizer、Scheduler、随机数状态、数据游标、Batch Schedule 哈希、
+Loss History 和 Dataset Version。恢复验收不是 Loss 近似，而是参考链与恢复链的逐步 Loss、最终 Model、
+Optimizer、Scheduler 和学习率全部精确相同。
+
 ## 证据等级
 
 | 等级 | 需要的证据 |

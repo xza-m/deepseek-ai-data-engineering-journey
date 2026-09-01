@@ -129,6 +129,19 @@ def _create_parser() -> argparse.ArgumentParser:
     validate_dataloader_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
     validate_dataloader_parser.add_argument("--compute-report", type=Path, required=True)
     validate_dataloader_parser.add_argument("--output", type=Path, required=True)
+
+    recovery_parser = commands.add_parser("run-recovery", help="执行 Lab 08 Checkpoint 精确恢复实验")
+    recovery_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
+    recovery_parser.add_argument("--dataloader-report", type=Path, required=True)
+    recovery_parser.add_argument("--output", type=Path, required=True)
+    recovery_parser.add_argument("--total-steps", type=int, default=12)
+    recovery_parser.add_argument("--interrupt-step", type=int, default=5)
+    recovery_parser.add_argument("--seed", type=int, default=2026)
+
+    validate_recovery_parser = commands.add_parser("validate-recovery", help="验证 Lab 08 Checkpoint 恢复")
+    validate_recovery_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
+    validate_recovery_parser.add_argument("--dataloader-report", type=Path, required=True)
+    validate_recovery_parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -355,6 +368,36 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = validate_dataloader_lab(args.input, args.compute_report, args.output)
         print("dataloader validation passed")
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "run-recovery":
+        try:
+            from ai_data_engineering.recovery import RecoveryConfig, run_recovery_lab
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
+            raise
+
+        result = run_recovery_lab(
+            args.input,
+            args.dataloader_report,
+            args.output,
+            RecoveryConfig(total_steps=args.total_steps, interrupt_step=args.interrupt_step, seed=args.seed),
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "validate-recovery":
+        try:
+            from ai_data_engineering.recovery import validate_recovery_lab
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit("训练依赖未安装，请运行: uv sync --extra train") from error
+            raise
+
+        result = validate_recovery_lab(args.input, args.dataloader_report, args.output)
+        print("recovery validation passed")
         print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 

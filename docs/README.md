@@ -13,6 +13,7 @@
 - [Lab 05：确定性混合、Packing 与 Sharding](tutorials/05-mixing-packing-sharding.md)
 - [Lab 06：Partition、Shuffle、倾斜与恢复](tutorials/06-partition-shuffle-recovery.md)
 - [Lab 07：DataLoader 与训练数据供给](tutorials/07-dataloader-io.md)
+- [Lab 08：Checkpoint 精确恢复与并行数据契约](tutorials/08-checkpoint-exact-recovery.md)
 
 Tutorial 会带领你完成一个具体结果。第一次学习请不要跳过步骤。
 
