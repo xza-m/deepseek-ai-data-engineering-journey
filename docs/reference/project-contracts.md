@@ -222,6 +222,12 @@ Lab 08 的 Checkpoint 必须保存 Model、Optimizer、Scheduler、随机数状�
 Loss History 和 Dataset Version。恢复验收不是 Loss 近似，而是参考链与恢复链的逐步 Loss、最终 Model、
 Optimizer、Scheduler 和学习率全部精确相同。
 
+## 存储报告 `storage_report.json`
+
+Lab 09 绑定 Dataset、Compute 和 Recovery Fingerprint，分别定义顺序 Shard 读、随机 Sample 读、Shuffle 写和
+Checkpoint 并行写。操作数和逻辑 Bytes 进入稳定版本；P50/P99、吞吐和环境能力属于观测。未部署 3FS 时，
+报告必须显式保存 `cluster_executed=false`，架构理解不能替代集群基准。
+
 ## 证据等级
 
 | 等级 | 需要的证据 |

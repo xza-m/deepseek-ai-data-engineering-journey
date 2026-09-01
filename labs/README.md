@@ -20,7 +20,7 @@
 | 06 | smallpond Partition、Shuffle 与故障 | 可运行 | [教程](../docs/tutorials/06-partition-shuffle-recovery.md) |
 | 07 | DataLoader 与 I/O | 可运行 | [教程](../docs/tutorials/07-dataloader-io.md) |
 | 08 | Checkpoint 与训练恢复 | 可运行 | [教程](../docs/tutorials/08-checkpoint-exact-recovery.md) |
-| 09 | 3FS 架构与 I/O | 规格已定义 | [路线第 13～14 周](../ROADMAP.md) |
+| 09 | 3FS 架构与 I/O | 可运行 | [教程](../docs/tutorials/09-3fs-storage-workloads.md) |
 | 10 | 正式数据 A/B 与毕业项目 | 规格已定义 | [路线第 15～16 周](../ROADMAP.md) |
 
 后续只在代码和测试可以一起提交时创建新 Lab 目录。
@@ -33,7 +33,6 @@ Bridge 补充源码证据、架构映射和个人学习产物，不替代后续�
 
 ## 当前开发优先级
 
-1. Lab 09：补齐 3FS 工作负载与存储决策；
-2. Lab 10：完成正式多 Seed 数据实验和毕业报告。
+1. Lab 10：完成正式多 Seed 数据实验和毕业报告。
 
 这个顺序优先建立反馈闭环。不能因为后续模块更“底层”或更新颖，就跳过训练基线和受控实验。

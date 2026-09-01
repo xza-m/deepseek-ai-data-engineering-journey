@@ -142,6 +142,21 @@ def _create_parser() -> argparse.ArgumentParser:
     validate_recovery_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
     validate_recovery_parser.add_argument("--dataloader-report", type=Path, required=True)
     validate_recovery_parser.add_argument("--output", type=Path, required=True)
+
+    storage_parser = commands.add_parser("benchmark-storage", help="执行 Lab 09 存储工作负载与 3FS 评审")
+    storage_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
+    storage_parser.add_argument("--compute", type=Path, required=True, help="Lab 06 产物目录")
+    storage_parser.add_argument("--recovery", type=Path, required=True, help="Lab 08 产物目录")
+    storage_parser.add_argument("--output", type=Path, required=True)
+    storage_parser.add_argument("--sequential-repeats", type=int, default=32)
+    storage_parser.add_argument("--random-read-count", type=int, default=256)
+    storage_parser.add_argument("--checkpoint-writers", type=int, default=4)
+
+    validate_storage_parser = commands.add_parser("validate-storage", help="验证 Lab 09 存储工作负载")
+    validate_storage_parser.add_argument("--input", type=Path, required=True, help="Lab 05 产物目录")
+    validate_storage_parser.add_argument("--compute", type=Path, required=True, help="Lab 06 产物目录")
+    validate_storage_parser.add_argument("--recovery", type=Path, required=True, help="Lab 08 产物目录")
+    validate_storage_parser.add_argument("--output", type=Path, required=True)
     return parser
 
 
@@ -398,6 +413,31 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = validate_recovery_lab(args.input, args.dataloader_report, args.output)
         print("recovery validation passed")
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "benchmark-storage":
+        from ai_data_engineering.storage_lab import StorageConfig, run_storage_lab
+
+        result = run_storage_lab(
+            args.input,
+            args.compute,
+            args.recovery,
+            args.output,
+            StorageConfig(
+                sequential_repeats=args.sequential_repeats,
+                random_read_count=args.random_read_count,
+                checkpoint_writers=args.checkpoint_writers,
+            ),
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+
+    if args.command == "validate-storage":
+        from ai_data_engineering.storage_lab import validate_storage_lab
+
+        result = validate_storage_lab(args.input, args.compute, args.recovery, args.output)
+        print("storage validation passed")
         print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 
